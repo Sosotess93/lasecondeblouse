@@ -132,10 +132,21 @@
   --text-body: 1.0625rem;
   --text-label: 0.75rem;
 
-  --ease-sortie: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Décélération franche puis longue traîne : le mouvement démarre vite et
+     s'éteint sans rebond. C'est ce qui donne l'impression de « posé »
+     plutôt que de « glissé ». */
+  --ease-sortie: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Courbe des micro-interactions : symétrique et courte. */
+  --ease-doux: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @layer base {
+  :root {
+    /* Autorise l'animation vers `auto` : indispensable à l'ouverture
+       progressive des <details> de la FAQ. Ignoré là où c'est inconnu. */
+    interpolate-size: allow-keywords;
+  }
+
   html {
     scroll-behavior: smooth;
     /* Compense le header sticky sur les ancres */
@@ -242,9 +253,9 @@
     line-height: 1.3;
     text-decoration: none;
     transition:
-      background-color 150ms,
-      border-color 150ms,
-      transform 150ms;
+      background-color 200ms var(--ease-doux),
+      border-color 200ms var(--ease-doux),
+      transform 200ms var(--ease-doux);
   }
 
   .bouton-compact {
@@ -283,14 +294,64 @@
     background-color: var(--color-or-600);
   }
 
-  /* Révélation au scroll : titres de section uniquement, une seule fois. */
+  /* Révélation au scroll, une seule fois par élément.
+     spec/05 la réservait aux titres de section. En pratique, un titre qui
+     apparaît seul au-dessus d'un contenu déjà posé ne se remarque pas : la
+     page paraît figée. Le corps suit donc le titre avec 120 ms de retard,
+     ce qui donne un ordre de lecture au lieu d'un effet décoratif. */
   .reveal {
     opacity: 0;
     transform: translateY(12px);
     transition:
-      opacity 600ms var(--ease-sortie),
-      transform 600ms var(--ease-sortie);
+      opacity 700ms var(--ease-sortie),
+      transform 700ms var(--ease-sortie);
+    /* Évite le rendu flou du texte pendant la transformation, et prévient
+       le compositeur plutôt que de le laisser réagir image par image. */
+    will-change: opacity, transform;
   }
+
+  .reveal.est-visible {
+    will-change: auto;
+  }
+
+  /* Le corps de section ne fait varier que son opacité, jamais sa position.
+     Un `transform` sur ce conteneur ferait de lui le bloc de référence de
+     ses descendants : l'encadré `position: sticky` de /rdv cesserait de
+     coller pendant toute la transition. Un pavé de texte qui glisse est de
+     toute façon plus distrayant qu'un titre qui monte de douze pixels. */
+  .reveal-differe {
+    transform: none;
+    transition-delay: 100ms;
+  }
+
+  /* Échelonnement.
+     Le conteneur gère l'opacité, ses enfants ne gèrent que le déplacement :
+     sans ça les deux opacités se multiplieraient et le tout paraîtrait mou.
+     Chaque enfant part 55 ms après le précédent, ce qui suffit à faire lire
+     une liste dans l'ordre sans donner l'impression d'attendre. */
+  .cascade > * {
+    transform: translateY(14px);
+    transition: transform 620ms var(--ease-sortie);
+    transition-delay: calc(var(--rang, 0) * 55ms + 100ms);
+  }
+
+  .reveal.est-visible .cascade > *,
+  .cascade.est-visible > * {
+    transform: none;
+  }
+
+  .cascade > *:nth-child(1) { --rang: 0; }
+  .cascade > *:nth-child(2) { --rang: 1; }
+  .cascade > *:nth-child(3) { --rang: 2; }
+  .cascade > *:nth-child(4) { --rang: 3; }
+  .cascade > *:nth-child(5) { --rang: 4; }
+  .cascade > *:nth-child(6) { --rang: 5; }
+  .cascade > *:nth-child(7) { --rang: 6; }
+  .cascade > *:nth-child(8) { --rang: 7; }
+  .cascade > *:nth-child(9) { --rang: 8; }
+  /* Au-delà, le décalage se fige : une dixième carte n'a pas à attendre
+     une demi-seconde de plus que la première. */
+  .cascade > *:nth-child(n + 10) { --rang: 9; }
 
   .reveal.est-visible {
     opacity: 1;
@@ -298,7 +359,34 @@
   }
 }
 
+/* Transitions de page natives, sans une ligne de JavaScript : le navigateur
+   fait un fondu entre l'ancienne et la nouvelle page. Les navigateurs qui ne
+   l'implémentent pas ignorent la règle et naviguent normalement.
+
+   L'en-tête et le pied de page sont nommés, donc traités comme persistants :
+   ils ne clignotent pas d'une page à l'autre, seul le contenu change. C'est
+   ce qui distingue une transition utile d'un effet décoratif. */
+@view-transition {
+  navigation: auto;
+}
+
+[data-header] {
+  view-transition-name: entete;
+}
+
+footer {
+  view-transition-name: pied-de-page;
+}
+
+::view-transition-group(root) {
+  animation-duration: 260ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
   html {
     scroll-behavior: auto;
   }
@@ -311,15 +399,22 @@
     transition-duration: 0.01ms !important;
   }
 
-  .reveal {
+  .reveal,
+  .cascade > * {
     opacity: 1;
     transform: none;
   }
+
+  .accordeon::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
 }
 
-/* Sécurité : si JS est absent, rien ne reste masqué. */
+/* Sécurité : sans JavaScript, rien ne doit rester masqué ni décalé. */
 @media (scripting: none) {
-  .reveal {
+  .reveal,
+  .cascade > * {
     opacity: 1;
     transform: none;
   }

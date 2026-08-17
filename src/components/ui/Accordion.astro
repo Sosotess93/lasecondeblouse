@@ -64,7 +64,7 @@ const { question, ouvert = false } = Astro.props;
   .chevron {
     flex-shrink: 0;
     color: var(--color-encre-500);
-    transition: transform 150ms var(--ease-sortie);
+    transition: transform 340ms var(--ease-sortie);
   }
 
   .accordeon[open] .chevron {
@@ -75,5 +75,26 @@ const { question, ouvert = false } = Astro.props;
     padding-bottom: 1.5rem;
     max-width: 62ch;
     color: var(--color-encre-700);
+  }
+
+  /* Ouverture progressive du <details>. C'était le seul endroit du site où
+     quelque chose apparaissait d'un coup, et ça s'entendait à l'œil.
+     `::details-content` et `interpolate-size` permettent d'animer vers une
+     hauteur automatique sans mesurer quoi que ce soit en JavaScript. Les
+     navigateurs qui ne les connaissent pas ouvrent comme avant, d'un bloc. */
+  .accordeon::details-content {
+    block-size: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      block-size 340ms var(--ease-sortie),
+      opacity 240ms var(--ease-doux),
+      content-visibility 340ms allow-discrete;
+    transition-behavior: allow-discrete;
+  }
+
+  .accordeon[open]::details-content {
+    block-size: auto;
+    opacity: 1;
   }
 </style>

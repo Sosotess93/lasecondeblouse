@@ -14,7 +14,7 @@ const entrees = await entreesFaq(page);
 ---
 
 <Section id="faq" titre={titre}>
-  <div class="mesure-large">
+  <div class="cascade mesure-large">
     {
       entrees.map((entree) => (
         <Accordion question={entree.data.question}>

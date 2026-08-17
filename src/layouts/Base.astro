@@ -127,19 +127,24 @@ const donneesStructurees = [organisation, ...schema];
     <BandeauCookies />
 
     <script>
-      // Révélation au scroll : titres de section uniquement, une seule fois.
+      // Révélation au scroll : le titre de section, puis son contenu.
       const aReveler = document.querySelectorAll('.reveal');
+      const toutReveler = () =>
+        aReveler.forEach((element) => element.classList.add('est-visible'));
       const mouvementReduit = window.matchMedia(
         '(prefers-reduced-motion: reduce)'
       ).matches;
 
       if (mouvementReduit || !('IntersectionObserver' in window)) {
-        aReveler.forEach((element) => element.classList.add('est-visible'));
+        toutReveler();
       } else {
+        let aRepondu = false;
+
         const observateur = new IntersectionObserver(
           (entrees) => {
+            aRepondu = true;
             entrees.forEach((entree) => {
-              // Un titre déjà dépassé (arrivée sur une ancre, retour arrière)
+              // Un bloc déjà dépassé (arrivée sur une ancre, retour arrière)
               // ne déclenchera jamais d’intersection : on le révèle aussitôt.
               const dejaPasse = entree.boundingClientRect.top < 0;
               if (!entree.isIntersecting && !dejaPasse) return;
@@ -150,6 +155,14 @@ const donneesStructurees = [organisation, ...schema];
           { threshold: 0.2, rootMargin: '0px 0px -5% 0px' }
         );
         aReveler.forEach((element) => observateur.observe(element));
+
+        // Filet de sécurité. La révélation couvre désormais le corps des
+        // sections, pas seulement leurs titres : si l’observateur ne répondait
+        // pas, c’est le contenu du site qui resterait invisible. Passé deux
+        // secondes sans le moindre retour, on affiche tout.
+        window.setTimeout(() => {
+          if (!aRepondu) toutReveler();
+        }, 2000);
       }
 
       // Analytics : un seul écouteur global sur [data-evt].
