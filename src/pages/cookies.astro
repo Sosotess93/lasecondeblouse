@@ -1,0 +1,115 @@
+---
+import Legal from '../layouts/Legal.astro';
+---
+
+<Legal
+  titre="Cookies et traceurs · La Seconde Blouse"
+  description="Liste des traceurs utilisés sur le site, leur finalité, leur durée, et comment revenir sur votre choix."
+  canonique="/cookies"
+  h1="Cookies et traceurs"
+>
+  <p>
+    Ce site ne dépose aucun traceur publicitaire. Il n’y a ni pixel Meta, ni
+    pixel TikTok, ni Google Ads, ni bouton de réseau social traçant. Rien n’est
+    déposé avant que vous ne l’ayez accepté.
+  </p>
+
+  <h2 id="necessaires">Ce qui fonctionne sans votre accord</h2>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Nom</th>
+        <th scope="col">Type</th>
+        <th scope="col">Finalité</th>
+        <th scope="col">Durée</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">lsb-consentement-mesure</th>
+        <td>Stockage local</td>
+        <td>
+          Mémoriser votre choix d’accepter ou de refuser la mesure d’audience,
+          pour ne pas vous reposer la question à chaque visite.
+        </td>
+        <td>6 mois</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    Cette information reste dans votre navigateur et n’est envoyée à aucun
+    serveur.
+  </p>
+
+  <h2 id="audience">Mesure d’audience, soumise à votre accord</h2>
+  <p>
+    Si vous l’acceptez, nous mesurons la fréquentation du site&nbsp;: quelles
+    pages sont consultées, lesquelles sont abandonnées, et combien de personnes
+    atteignent la page de réservation. L’outil est configuré sans cookie et sans
+    identifiant persistant&nbsp;: la mesure ne dépasse pas la session en cours,
+    l’adresse IP n’est pas conservée, et aucun suivi n’est effectué entre
+    sites.
+  </p>
+  <p>
+    Nous n’enregistrons ni les mouvements de souris, ni les sessions vidéo, ni
+    le contenu saisi dans les formulaires.
+  </p>
+
+  <h2 id="tiers">Contenus tiers chargés à la demande</h2>
+  <p>
+    L’agenda de prise de rendez-vous (Cal.com) n’est chargé que si vous cliquez
+    sur le bouton correspondant sur la page <a href="/rdv">réserver un appel</a>.
+    Tant que vous ne cliquez pas, aucune requête n’est envoyée à ce service et
+    aucun cookie tiers n’est déposé. En l’ouvrant, vous acceptez que Cal.com
+    dépose les cookies nécessaires à son fonctionnement.
+  </p>
+
+  <h2 id="revenir">Revenir sur votre choix</h2>
+  <p>
+    Vous pouvez modifier votre décision à tout moment. Le bandeau réapparaîtra
+    et votre choix précédent sera effacé.
+  </p>
+  <p>
+    <button
+      type="button"
+      data-rouvrir-preferences
+      class="inline-flex min-h-[44px] items-center justify-center rounded-[4px] border border-encre-500 px-5 py-2.5 font-semibold text-encre-700 no-underline transition-colors duration-150 hover:bg-papier-100"
+    >
+      Modifier mon choix
+    </button>
+  </p>
+  <p
+    data-confirmation-preferences
+    role="status"
+    aria-live="polite"
+    class="text-encre-500 empty:hidden"
+  >
+  </p>
+  <p>
+    Vous pouvez également configurer votre navigateur pour bloquer ou effacer
+    les traceurs. Les modalités varient selon le navigateur&nbsp;; elles sont
+    décrites dans son aide.
+  </p>
+</Legal>
+
+<script>
+  const bouton = document.querySelector<HTMLButtonElement>(
+    '[data-rouvrir-preferences]'
+  );
+  const confirmation = document.querySelector<HTMLElement>(
+    '[data-confirmation-preferences]'
+  );
+
+  bouton?.addEventListener('click', () => {
+    if (typeof window.lsbOuvrirPreferences === 'function') {
+      window.lsbOuvrirPreferences();
+      if (confirmation) {
+        confirmation.textContent =
+          'Votre choix a été effacé. Le bandeau réapparaît en bas de page.';
+      }
+    } else if (confirmation) {
+      confirmation.textContent =
+        "Aucune mesure d’audience n’est active sur ce site : il n’y a rien à modifier.";
+    }
+  });
+</script>

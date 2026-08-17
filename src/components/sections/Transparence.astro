@@ -1,0 +1,95 @@
+---
+import Section from '../layout/Section.astro';
+import AConfirmer from '../ui/AConfirmer.astro';
+import { tarif } from '../../data/site';
+
+/* Le prix vient de src/data/site.ts, jamais du composant : il changera. */
+const formateurEuros = new Intl.NumberFormat('fr-FR', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+
+const prixAffiche =
+  tarif.montant !== null ? formateurEuros.format(tarif.montant) : null;
+
+const cequeCeNestPas = [
+  {
+    titre: "Ce n’est pas un emploi.",
+    corps:
+      'Vous serez indépendante. Personne ne vous garantit un revenu, et nous ne le ferons pas.',
+  },
+  {
+    titre: "Ce n’est pas éligible au CPF.",
+    corps:
+      'Le programme n’est pas enregistré au RNCP et nous ne sommes pas certifiés Qualiopi. C’est un investissement personnel.',
+  },
+  {
+    titre: "Ce n’est pas rapide.",
+    corps:
+      'Comptez plusieurs mois entre le début du programme et vos premiers appels réels, en travaillant régulièrement.',
+  },
+  {
+    titre: "Ce n’est pas pour tout le monde.",
+    corps:
+      'Si vous détestez le téléphone, si l’idée de parler d’argent vous bloque profondément, ou si vous avez besoin d’un revenu garanti le mois prochain, ce n’est pas le bon moment. On vous le dira pendant l’appel.',
+  },
+];
+---
+
+<Section
+  id="transparence"
+  tone="accent"
+  eyebrow="Avant d’aller plus loin"
+  titre="Ce que ça coûte, et ce que ce n’est pas."
+>
+  {/* Jalon analytics : combien de visiteurs atteignent réellement le prix. */}
+  <div data-jalon="scroll_transparence"></div>
+
+  <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+    <div>
+      <div class="rounded-[4px] border border-papier-200 bg-craie p-7 md:p-8">
+        <p class="eyebrow mb-4 text-encre-500">Le tarif</p>
+        {
+          prixAffiche ? (
+            <p class="font-display text-[2.5rem] leading-none">{prixAffiche}</p>
+          ) : (
+            <p class="text-[1.15rem]">
+              <AConfirmer quoi="tarif du programme" />
+            </p>
+          )
+        }
+        <p class="mt-5 text-encre-700">
+          {
+            tarif.nombreEcheances ? (
+              <>Paiement en {tarif.nombreEcheances} fois possible.</>
+            ) : (
+              <>
+                Paiement échelonné possible&nbsp;:{' '}
+                <AConfirmer quoi="modalités à confirmer" />
+              </>
+            )
+          }
+        </p>
+        <p class="mt-4 text-encre-700">
+          Le tarif est le même pour tout le monde, il n’y a pas de remise
+          conditionnée à une décision immédiate, et il ne change pas selon
+          l’heure à laquelle vous appelez.
+        </p>
+      </div>
+    </div>
+
+    <ul class="space-y-7">
+      {
+        cequeCeNestPas.map((bloc) => (
+          <li class="border-l-2 border-papier-200 pl-5">
+            <p class="text-encre-700">
+              <strong class="font-semibold text-encre-900">{bloc.titre}</strong>{' '}
+              {bloc.corps}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Section>

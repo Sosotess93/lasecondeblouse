@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/layout/Section.astro';
+import Button from '../../components/ui/Button.astro';
+import { contact } from '../../data/site';
+---
+
+<Base
+  titre="C’est envoyé · La Seconde Blouse"
+  description="Confirmation d’envoi du guide des métiers du digital accessibles sans reprendre d’études."
+  canonique="/guide/merci"
+  noindex
+>
+  <Section spacing="serre" titre="C’est envoyé." titreH1>
+    <p class="lead mesure text-encre-700">
+      Le guide arrive dans votre boîte mail d’ici deux minutes. Pensez aux
+      spams&nbsp;: les e-mails d’un nouvel expéditeur y atterrissent souvent.
+    </p>
+
+    {
+      contact.email && (
+        <p class="mt-5 mesure text-encre-700">
+          Rien au bout de dix minutes&nbsp;? Écrivez-nous à{' '}
+          <a
+            href={`mailto:${contact.email}`}
+            class="underline underline-offset-2"
+          >
+            {contact.email}
+          </a>
+          , on vous le renvoie.
+        </p>
+      )
+    }
+
+    <div class="mt-12 grid gap-6 md:grid-cols-2">
+      <div class="rounded-[4px] border border-papier-200 bg-papier-100 p-6">
+        <h2 class="mb-3 font-body text-[1.15rem] font-semibold">Pendant ce temps</h2>
+        <p class="mb-5 text-encre-700">
+          Le closing est l’un des sept métiers du guide. Si c’est celui qui vous
+          intrigue, la page du programme en détaille le contenu, la durée et le
+          tarif.
+        </p>
+        <Button href="/programme" variante="secondaire">Voir le programme</Button>
+      </div>
+
+      <div class="rounded-[4px] border border-papier-200 bg-papier-100 p-6">
+        <h2 class="mb-3 font-body text-[1.15rem] font-semibold">Si vous préférez en parler</h2>
+        <p class="mb-5 text-encre-700">
+          30 minutes au téléphone, gratuit et sans engagement. On vous dira aussi
+          quand ce n’est pas adapté.
+        </p>
+        <Button href="/rdv" variante="secondaire" evenement="cta_merci">
+          Réserver un appel
+        </Button>
+      </div>
+    </div>
+  </Section>
+</Base>

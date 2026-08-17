@@ -1,0 +1,154 @@
+---
+import AConfirmer from '../ui/AConfirmer.astro';
+import { agenda } from '../../data/site';
+
+interface Props {
+  libelle?: string;
+}
+
+const { libelle = 'Voir les créneaux disponibles' } = Astro.props;
+
+/* La bio Instagram pointe vers Calendly, la spec prévoyait Cal.com : le
+   composant accepte les deux et détecte le fournisseur d'après l'URL. */
+const url = agenda.url;
+const fournisseur = agenda.fournisseur;
+---
+
+{
+  url ? (
+    <div data-agenda data-agenda-url={url} data-agenda-fournisseur={fournisseur}>
+      {/* Aucune iframe au chargement : ~200 ko économisés et aucun cookie
+          tiers déposé sans action de l'utilisateur. */}
+      <button
+        type="button"
+        data-agenda-ouvrir
+        data-evt="cal_ouvert"
+        class="bouton bouton-primaire"
+      >
+        {libelle}
+      </button>
+      <p
+        data-agenda-attente
+        aria-live="polite"
+        class="mt-3 text-[0.9375rem] text-encre-500 empty:hidden"
+      />
+      <div
+        data-agenda-conteneur
+        hidden
+        class="mt-6 min-h-[40rem] overflow-hidden rounded-[4px] border border-papier-200 bg-craie"
+      />
+      <p data-agenda-repli hidden class="mt-3 text-[0.9375rem] text-encre-700">
+        L’agenda ne s’ouvre pas&nbsp;?{' '}
+        <a
+          href={url}
+          rel="noopener noreferrer"
+          target="_blank"
+          class="underline underline-offset-2"
+        >
+          Ouvrir la page de réservation dans un nouvel onglet
+        </a>
+        , ou utilisez le formulaire ci-dessous.
+      </p>
+    </div>
+  ) : (
+    <div class="rounded-[4px] border border-dashed border-papier-200 bg-papier-100 p-6">
+      <p class="eyebrow mb-2 text-or-600">Agenda à connecter</p>
+      <p class="text-encre-700">
+        L’URL de réservation n’est pas encore configurée (variable{' '}
+        <code class="font-mono text-[0.9em]">PUBLIC_AGENDA_URL</code>). Le
+        formulaire ci-dessous fonctionne indépendamment.{' '}
+        <AConfirmer quoi="URL de l’agenda" />
+      </p>
+    </div>
+  )
+}
+
+<script>
+  const bloc = document.querySelector<HTMLElement>('[data-agenda]');
+  const bouton = bloc?.querySelector<HTMLButtonElement>('[data-agenda-ouvrir]');
+  const conteneur = bloc?.querySelector<HTMLElement>('[data-agenda-conteneur]');
+  const attente = bloc?.querySelector<HTMLElement>('[data-agenda-attente]');
+  const repli = bloc?.querySelector<HTMLElement>('[data-agenda-repli]');
+  const url = bloc?.dataset.agendaUrl;
+  const fournisseur = bloc?.dataset.agendaFournisseur;
+
+  let enCours = false;
+
+  function charger(balise: 'script' | 'lien', href: string): Promise<void> {
+    return new Promise((resoudre, rejeter) => {
+      const identifiant = `agenda-${balise}-${fournisseur}`;
+      if (document.getElementById(identifiant)) return resoudre();
+
+      const element =
+        balise === 'script'
+          ? Object.assign(document.createElement('script'), { src: href, async: true })
+          : Object.assign(document.createElement('link'), { rel: 'stylesheet', href });
+
+      element.id = identifiant;
+      element.onload = () => resoudre();
+      element.onerror = () => rejeter(new Error('ressource indisponible'));
+      document.head.appendChild(element);
+    });
+  }
+
+  bouton?.addEventListener('click', async () => {
+    if (enCours || !url || !conteneur) return;
+    enCours = true;
+    bouton.disabled = true;
+    if (attente) attente.textContent = 'Chargement de l’agenda…';
+
+    try {
+      if (fournisseur === 'calendly') {
+        await charger('lien', 'https://assets.calendly.com/assets/external/widget.css');
+        await charger('script', 'https://assets.calendly.com/assets/external/widget.js');
+
+        const calendly = (window as unknown as { Calendly?: { initInlineWidget: (o: unknown) => void } })
+          .Calendly;
+        if (!calendly) throw new Error('Calendly absent');
+
+        const separateur = url.includes('?') ? '&' : '?';
+        calendly.initInlineWidget({
+          url: `${url}${separateur}hide_gdpr_banner=1`,
+          parentElement: conteneur,
+        });
+
+        window.addEventListener('message', (evenement) => {
+          if (
+            evenement.origin.endsWith('calendly.com') &&
+            typeof evenement.data?.event === 'string' &&
+            evenement.data.event === 'calendly.event_scheduled'
+          ) {
+            window.lsbTrack?.('rdv_reserve', { page: location.pathname });
+          }
+        });
+      } else {
+        await charger('script', 'https://app.cal.com/embed/embed.js');
+
+        const cal = (window as unknown as { Cal?: (...args: unknown[]) => void }).Cal;
+        if (!cal) throw new Error('Cal absent');
+
+        cal('init', { origin: 'https://cal.com' });
+        cal('inline', {
+          elementOrSelector: conteneur,
+          calLink: url,
+          config: { layout: 'month_view' },
+        });
+        cal('on', {
+          action: 'bookingSuccessful',
+          callback: () => window.lsbTrack?.('rdv_reserve', { page: location.pathname }),
+        });
+      }
+
+      conteneur.hidden = false;
+      bouton.hidden = true;
+      if (attente) attente.textContent = '';
+      if (repli) repli.hidden = false;
+      conteneur.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch {
+      enCours = false;
+      bouton.disabled = false;
+      if (attente) attente.textContent = '';
+      if (repli) repli.hidden = false;
+    }
+  });
+</script>

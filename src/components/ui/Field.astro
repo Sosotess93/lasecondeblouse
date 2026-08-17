@@ -1,0 +1,88 @@
+---
+interface Props {
+  nom: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'select' | 'textarea';
+  requis?: boolean;
+  options?: { valeur: string; label: string }[];
+  aide?: string;
+  autocomplete?: string;
+  lignes?: number;
+}
+
+const {
+  nom,
+  label,
+  type = 'text',
+  requis = false,
+  options = [],
+  aide,
+  autocomplete,
+  lignes = 4,
+} = Astro.props;
+
+const idAide = aide ? `${nom}-aide` : undefined;
+const idErreur = `${nom}-erreur`;
+
+/* Label toujours visible au-dessus du champ : jamais de placeholder en
+   guise de label (cf. spec/07-composants.md §Field). */
+const classesChamp =
+  'w-full min-h-[44px] rounded-[4px] border border-papier-200 bg-craie px-3.5 py-2.5 text-[1.0625rem] text-encre-900 transition-colors duration-150 focus:border-encre-500 aria-[invalid=true]:border-or-600';
+---
+
+<div class="champ">
+  <label for={nom} class="mb-1.5 block font-semibold">
+    {label}
+    {
+      !requis && (
+        <span class="ml-1 font-normal text-encre-500">(facultatif)</span>
+      )
+    }
+  </label>
+
+  {aide && <p id={idAide} class="mb-2 text-[0.875rem] text-encre-500">{aide}</p>}
+
+  {
+    type === 'textarea' ? (
+      <textarea
+        id={nom}
+        name={nom}
+        required={requis}
+        rows={lignes}
+        aria-describedby={[idAide, idErreur].filter(Boolean).join(' ')}
+        class={classesChamp}
+      />
+    ) : type === 'select' ? (
+      <select
+        id={nom}
+        name={nom}
+        required={requis}
+        aria-describedby={[idAide, idErreur].filter(Boolean).join(' ')}
+        class={classesChamp}
+      >
+        <option value="">Choisir…</option>
+        {options.map((option) => (
+          <option value={option.valeur}>{option.label}</option>
+        ))}
+      </select>
+    ) : (
+      <input
+        id={nom}
+        name={nom}
+        type={type}
+        required={requis}
+        autocomplete={autocomplete}
+        aria-describedby={[idAide, idErreur].filter(Boolean).join(' ')}
+        class={classesChamp}
+      />
+    )
+  }
+
+  <p
+    id={idErreur}
+    data-erreur-champ={nom}
+    aria-live="polite"
+    class="mt-1.5 text-[0.875rem] text-or-600 empty:mt-0"
+  >
+  </p>
+</div>

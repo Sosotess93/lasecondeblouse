@@ -1,0 +1,26 @@
+---
+import Section from '../layout/Section.astro';
+import Accordion from '../ui/Accordion.astro';
+import { entreesFaq, type PageFaq } from '../../lib/faq';
+
+interface Props {
+  page?: PageFaq;
+  titre?: string;
+}
+
+const { page = 'landing', titre = 'Questions fréquentes' } = Astro.props;
+
+const entrees = await entreesFaq(page);
+---
+
+<Section id="faq" titre={titre}>
+  <div class="mesure-large">
+    {
+      entrees.map((entree) => (
+        <Accordion question={entree.data.question}>
+          <p>{entree.data.reponse}</p>
+        </Accordion>
+      ))
+    }
+  </div>
+</Section>

@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
+import Agenda from '../components/sections/Agenda.astro';
+import FormulaireRdv from '../components/sections/FormulaireRdv.astro';
+import { appel } from '../data/site';
+
+const temps = [
+  { numero: '1', titre: 'Votre situation', minutes: 10 },
+  { numero: '2', titre: 'Les questions', minutes: 10 },
+  { numero: '3', titre: 'Le programme', minutes: 5 },
+  { numero: '4', titre: 'Votre décision', minutes: 5 },
+];
+---
+
+<Base
+  titre="Réserver un appel de découverte · La Seconde Blouse"
+  description="Choisissez un créneau de 30 minutes avec Oumaya, ou demandez à être rappelée. Gratuit, sans engagement : on vous présente le programme, son contenu et son tarif."
+  canonique="/rdv"
+>
+  <Section
+    spacing="serre"
+    eyebrow="Prise de rendez-vous"
+    titre="Réserver un appel de découverte"
+    titreH1
+  >
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-16">
+      <div>
+        <p class="lead mesure text-encre-700">
+          {appel.dureeMinutes} minutes au téléphone, gratuit et sans engagement.
+          Autant l’annoncer&nbsp;: c’est un appel pendant lequel on vous présente
+          un programme payant. Vous repartez avec une réponse claire, même si
+          c’est non.
+        </p>
+
+        {/* Deux chemins volontairement : l'agenda pour celles qui savent déjà
+            quand elles sont disponibles, le formulaire pour les autres ,
+            beaucoup ouvrent le site depuis Instagram, tard, sur téléphone. */}
+        <div class="mt-10">
+          <h2 class="font-body text-[1.15rem] font-semibold">
+            Choisir un créneau maintenant
+          </h2>
+          <p class="mt-2 mb-5 mesure text-encre-700">
+            L’agenda affiche les disponibilités réelles. Vous recevez une
+            confirmation par e-mail avec le rappel de la durée et de la gratuité.
+          </p>
+          <Agenda libelle="Voir les créneaux disponibles" />
+        </div>
+
+        <div class="mt-14 border-t border-papier-200 pt-12">
+          <h2 class="font-body text-[1.15rem] font-semibold">
+            Ou demander à être rappelée
+          </h2>
+          <p class="mt-2 mb-6 mesure text-encre-700">
+            Si aucun créneau ne vous convient, ou si vous préférez qu’on vous
+            appelle&nbsp;: laissez vos coordonnées et le moment où vous joindre.
+            Vous restez libre de refuser l’appel ensuite.
+          </p>
+          <FormulaireRdv />
+        </div>
+      </div>
+
+      <aside
+        class="h-fit rounded-[4px] border border-papier-200 bg-papier-100 p-6 md:p-7 lg:sticky lg:top-28"
+      >
+        <h2 class="mb-5 font-body text-[1.15rem] font-semibold">
+          Ce qui vous attend
+        </h2>
+        <ol class="space-y-4">
+          {
+            temps.map((item) => (
+              <li class="flex gap-3">
+                <span
+                  class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[2px] border border-or-500 font-mono text-[0.6875rem] text-or-600"
+                  aria-hidden="true"
+                >
+                  {item.numero}
+                </span>
+                <span class="text-[0.9375rem] text-encre-700">
+                  <strong class="font-semibold text-encre-900">{item.titre}</strong>
+                  <span class="ml-2 font-mono text-[0.75rem] text-encre-500">
+                    {item.minutes} min
+                  </span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <p class="mt-6 border-t border-papier-200 pt-5 text-[0.9375rem] text-encre-700">
+          Vous n’êtes pas obligée de décider pendant l’appel. Si vous voulez y
+          réfléchir, on raccroche et vous nous recontactez quand vous voulez. Le
+          tarif sera le même.
+        </p>
+
+        <p class="mt-4 text-[0.9375rem] text-encre-700">
+          Prévoyez un endroit où vous pouvez parler tranquillement. Un
+          rappel&nbsp;: le closing se pratique au téléphone, l’appel en donne
+          déjà un aperçu.
+        </p>
+      </aside>
+    </div>
+  </Section>
+</Base>

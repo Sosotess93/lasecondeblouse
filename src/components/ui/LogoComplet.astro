@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Logo complet de la marque, celui d'Instagram.
+ *
+ * Détecté au build : dès que `src/assets/logo.svg` ou `logo.png` existe, il
+ * est utilisé. S'il est absent, le composant rend son contenu de repli, ou
+ * rien du tout si aucun n'est fourni.
+ *
+ * Il n'est volontairement pas employé dans l'en-tête : à 26 px de haut, la
+ * silhouette et le rayonnement disparaissent. L'en-tête garde la marque
+ * géométrique de `Logo.astro`.
+ */
+
+interface Props {
+  /** Largeur de rendu, en pixels. Ignorée si `hauteur` est fournie. */
+  largeur?: number;
+  /** Hauteur de rendu, en pixels. Utile dans une barre, où c’est elle qui contraint. */
+  hauteur?: number;
+  class?: string;
+  /** Chargement prioritaire si le logo est au-dessus de la ligne de flottaison. */
+  prioritaire?: boolean;
+}
+
+const {
+  largeur = 420,
+  hauteur,
+  class: classe = '',
+  prioritaire = false,
+} = Astro.props;
+
+const trouves = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/logo.{svg,png,jpg,jpeg,webp}',
+  { eager: true }
+);
+
+const entree = Object.values(trouves)[0];
+const logo = entree?.default;
+---
+
+{
+  logo ? (
+    <Image
+      src={logo}
+      alt="La Seconde Blouse"
+      {...(hauteur ? { height: hauteur } : { width: largeur })}
+      densities={[1, 2]}
+      loading={prioritaire ? 'eager' : 'lazy'}
+      fetchpriority={prioritaire ? 'high' : 'auto'}
+      class:list={[hauteur ? 'w-auto' : 'h-auto w-full', classe]}
+      style={hauteur ? `height:${hauteur}px` : undefined}
+    />
+  ) : (
+    <slot />
+  )
+}

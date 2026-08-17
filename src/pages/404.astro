@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
+import Button from '../components/ui/Button.astro';
+---
+
+<Base
+  titre="Page introuvable · La Seconde Blouse"
+  description="Cette page n’existe pas."
+  canonique="/404"
+  noindex
+>
+  <Section spacing="serre" titre="Cette page n’existe pas." titreH1>
+    <p class="lead mesure text-encre-700">
+      Le programme, lui, est par ici.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-4">
+      <Button href="/programme">Voir le programme</Button>
+      <Button href="/" variante="secondaire">Retour à l’accueil</Button>
+    </div>
+  </Section>
+</Base>

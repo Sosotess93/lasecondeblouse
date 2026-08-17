@@ -1,0 +1,35 @@
+---
+import { DISCLAIMER_RESULTATS, DISCLAIMER_MEDICAL } from '../../data/site';
+
+interface Props {
+  variante?: 'footer' | 'inline';
+  class?: string;
+}
+
+const { variante = 'inline', class: classe = '' } = Astro.props;
+---
+
+{
+  variante === 'footer' ? (
+    <p
+      class:list={[
+        'border-t border-encre-700 py-8 text-[0.8125rem] leading-relaxed text-encre-200',
+        classe,
+      ]}
+    >
+      {/* Espace explicite : Astro élimine celui qui sépare deux expressions,
+          ce qui collait les deux phrases du disclaimer sur toutes les pages. */}
+      {`${DISCLAIMER_RESULTATS} ${DISCLAIMER_MEDICAL}`}
+    </p>
+  ) : (
+    <p
+      class:list={[
+        'mesure-large border-l-2 border-papier-200 pl-4 text-[0.875rem] leading-relaxed text-encre-500',
+        classe,
+      ]}
+    >
+      {DISCLAIMER_RESULTATS}
+      <slot />
+    </p>
+  )
+}

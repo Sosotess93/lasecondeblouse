@@ -1,0 +1,61 @@
+---
+import Container from './Container.astro';
+
+interface Props {
+  id?: string;
+  /** `sombre` réservé à §4 (compétences) et §9 (appel). `accent` à §8. */
+  tone?: 'clair' | 'sombre' | 'accent';
+  spacing?: 'normal' | 'serre';
+  eyebrow?: string;
+  titre?: string;
+  /** Rend le titre en <h1>, une seule fois par page. */
+  titreH1?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  tone = 'clair',
+  spacing = 'normal',
+  eyebrow,
+  titre,
+  titreH1 = false,
+  class: classe = '',
+} = Astro.props;
+
+const fonds = {
+  clair: 'bg-papier-50 text-encre-900',
+  sombre: 'bg-encre-900 text-papier-50 sur-sombre',
+  accent: 'bg-papier-100 text-encre-900',
+};
+
+const couleursEyebrow = {
+  clair: 'text-or-600',
+  sombre: 'text-or-100',
+  accent: 'text-or-600',
+};
+
+const espacements = {
+  normal: 'py-24 md:py-36',
+  serre: 'py-16 md:py-24',
+};
+
+const TitreBalise = titreH1 ? 'h1' : 'h2';
+---
+
+{/* Seul composant qui applique de l’espacement vertical de section. */}
+<section id={id} class:list={[fonds[tone], espacements[spacing], classe]}>
+  <Container>
+    {
+      (eyebrow || titre) && (
+        <header class="reveal mb-10 md:mb-14">
+          {eyebrow && (
+            <p class:list={['eyebrow mb-4', couleursEyebrow[tone]]}>{eyebrow}</p>
+          )}
+          {titre && <TitreBalise class="mesure-large">{titre}</TitreBalise>}
+        </header>
+      )
+    }
+    <slot />
+  </Container>
+</section>

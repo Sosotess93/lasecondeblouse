@@ -1,0 +1,71 @@
+---
+import Section from '../layout/Section.astro';
+
+const cequeCeNestPas = [
+  {
+    titre: "Ce n’est pas du démarchage.",
+    corps:
+      'Vous n’appelez jamais quelqu’un qui n’a rien demandé. La personne a pris rendez-vous.',
+  },
+  {
+    titre: "Ce n’est pas du forcing.",
+    corps:
+      'Un closeur qui vend à quelqu’un pour qui ce n’est pas adapté génère des remboursements et perd son client. Son intérêt et celui du prospect vont dans le même sens.',
+  },
+  {
+    titre: "Ce n’est pas un métier sans effort.",
+    corps:
+      'C’est un métier de conversation difficile, avec des refus, des journées vides et des appels qui n’aboutissent pas.',
+  },
+];
+---
+
+<Section id="le-metier" eyebrow="Le métier" titre="Le closing, concrètement">
+  <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16">
+    <div class="mesure space-y-5 text-encre-700">
+      <p>
+        Une entreprise vend une formation ou un accompagnement à plusieurs
+        milliers d’euros. Les personnes intéressées remplissent un formulaire et
+        réservent un appel. Le closeur passe cet appel.
+      </p>
+      <p>
+        Son travail&nbsp;: comprendre la situation de la personne, identifier ce
+        qu’elle cherche vraiment, vérifier que le programme y répond, et lui
+        dire clairement quand ce n’est pas le cas. Si c’est adapté, il
+        l’accompagne jusqu’à la décision et gère les modalités.
+      </p>
+      <p>
+        Un appel dure entre 30 et 60 minutes. Le closeur est indépendant,
+        travaille de chez lui, et fixe ses créneaux avec ses clients.
+      </p>
+    </div>
+
+    <div class="space-y-7">
+      {
+        cequeCeNestPas.map((bloc) => (
+          <div class="border-l-2 border-papier-200 pl-5">
+            <p class="text-encre-700">
+              <strong class="font-semibold text-encre-900">{bloc.titre}</strong>{' '}
+              {bloc.corps}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  {/* Formulation verrouillée, cf. spec/04-copy.md §3. Ne pas modifier. */}
+  <div
+    class="mt-14 mesure-large rounded-[4px] border border-papier-200 bg-papier-100 p-6 md:p-7"
+  >
+    <h3 class="mb-3">Comment on est payé</h3>
+    <p class="text-encre-700">
+      Le closeur est un indépendant rémunéré à la commission&nbsp;: un
+      pourcentage du montant des ventes qu’il conclut, selon les conditions
+      négociées avec chaque client. Le revenu est donc variable. Il dépend du
+      produit, du volume d’appels confiés, du taux de conversion, et il peut
+      être nul certains mois. Aucun montant ne peut être annoncé à l’avance, et
+      nous n’en annoncerons pas.
+    </p>
+  </div>
+</Section>

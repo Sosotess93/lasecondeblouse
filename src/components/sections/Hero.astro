@@ -1,0 +1,76 @@
+---
+import Container from '../layout/Container.astro';
+import Button from '../ui/Button.astro';
+import PhotoOumaya from '../ui/PhotoOumaya.astro';
+import PlanningGrid from '../planning/PlanningGrid.astro';
+---
+
+<section class="bg-papier-50 pt-12 pb-16 md:pt-20 md:pb-24">
+  <Container>
+    <div class="grid items-start gap-10 md:grid-cols-12 md:gap-12">
+      <div class="md:col-span-7">
+        <p class="eyebrow text-or-600">
+          Programme de reconversion pour les professionnels de santé
+        </p>
+
+        <h1 class="mt-5 mesure-large">
+          Votre métier vous a appris à écouter quelqu’un qui va mal.<br
+            class="hidden md:inline"
+          /> On vous apprend à en faire une activité qui vous appartient.
+        </h1>
+
+        <p class="lead mt-7 mesure text-encre-700">
+          La Seconde Blouse forme des soignants au closing éthique&nbsp;:
+          accompagner par téléphone des personnes déjà intéressées par une
+          formation, jusqu’à leur décision. Un métier à distance, aux horaires
+          choisis, qui repose sur ce que vous savez déjà faire.
+        </p>
+
+        <div class="mt-9">
+          <Button href="/rdv" evenement="cta_hero">
+            Réserver un appel de découverte
+          </Button>
+        </div>
+
+        <p class="mt-5 mesure text-[0.9375rem] leading-relaxed text-encre-500">
+          30 minutes, gratuit, sans engagement. On vous présente le programme,
+          son contenu et son tarif. Vous repartez avec une réponse claire, même
+          si c’est non.
+        </p>
+
+        {/* Second CTA volontairement discret : un bouton de poids égal
+            entrerait en concurrence avec la réservation d’appel. */}
+        <p class="mt-6">
+          <a
+            href="#le-metier"
+            class="inline-flex items-center gap-2 py-2 text-encre-700 underline underline-offset-4 hover:text-encre-900"
+          >
+            Comprendre le métier d’abord
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path
+                d="M7 2v9m0 0 3.5-3.5M7 11 3.5 7.5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="square"></path>
+            </svg>
+          </a>
+        </p>
+      </div>
+
+      <div class="md:col-span-5">
+        <PhotoOumaya prioritaire class="max-w-[20rem] md:ml-auto md:max-w-[24rem]" />
+      </div>
+    </div>
+  </Container>
+
+  {/* La grille traverse la largeur du conteneur, débordant de 40px sur desktop. */}
+  <Container class="mt-14 md:mt-20">
+    <div class="overflow-x-auto md:-mx-10 md:px-10">
+      <PlanningGrid
+        anime
+        legendeAvant="Votre mois de mars. Vous ne l’avez pas choisi."
+        legendeApres="Et si vous le remplissiez vous-même ?"
+      />
+    </div>
+  </Container>
+</section>

@@ -1,0 +1,128 @@
+---
+import Legal from '../layouts/Legal.astro';
+import AConfirmer from '../components/ui/AConfirmer.astro';
+import { contact, editrice, hebergeur, site } from '../data/site';
+---
+
+<Legal
+  titre="Mentions légales · La Seconde Blouse"
+  description="Identité de l’éditeur, hébergeur et informations légales du site La Seconde Blouse."
+  canonique="/mentions-legales"
+  h1="Mentions légales"
+>
+  <p>
+    Conformément à l’article 6 de la loi n° 2004-575 du 21 juin 2004 pour la
+    confiance dans l’économie numérique.
+  </p>
+
+  <h2 id="editeur">Éditeur du site</h2>
+  <table>
+    <tbody>
+      <tr>
+        <th scope="row">Raison sociale</th>
+        <td>{editrice.raisonSociale ?? <AConfirmer quoi="raison sociale" />}</td>
+      </tr>
+      <tr>
+        <th scope="row">Forme juridique</th>
+        <td>{editrice.formeJuridique ?? <AConfirmer quoi="forme juridique" />}</td>
+      </tr>
+      <tr>
+        <th scope="row">Capital social</th>
+        <td>{editrice.capital ?? <AConfirmer quoi="capital social" />}</td>
+      </tr>
+      <tr>
+        <th scope="row">SIREN</th>
+        <td>{editrice.siren ?? <AConfirmer quoi="SIREN" />}</td>
+      </tr>
+      <tr>
+        <th scope="row">Siège social</th>
+        <td>{editrice.adresse ?? <AConfirmer quoi="adresse du siège" />}</td>
+      </tr>
+      <tr>
+        <th scope="row">Contact</th>
+        <td>
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">Téléphone</th>
+        <td>
+          <a href={contact.telephoneLien}>{contact.telephone}</a>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row">Directrice de la publication</th>
+        <td>{editrice.directricePublication}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  {/* Point à trancher avec le juriste : le numéro de contact est tunisien.
+      Le lieu d'établissement décide du régime applicable (mentions légales,
+      médiateur de la consommation, TVA). Le droit de la consommation de l'UE
+      continue de s'appliquer à la vente à distance vers des consommateurs
+      français, mais l'obligation d'adhérer à un médiateur français ne vise
+      que les professionnels établis en France. Suivi dans `editrice.pays`
+      de src/data/site.ts, pour que le contrôle de conformité le réclame sans
+      qu'une note de recette s'affiche aux visiteurs. */}
+  <h2 id="hebergeur">Hébergeur</h2>
+  <table>
+    <tbody>
+      <tr>
+        <th scope="row">Nom</th>
+        <td>{hebergeur.nom}</td>
+      </tr>
+      <tr>
+        <th scope="row">Adresse</th>
+        <td>{hebergeur.adresse}</td>
+      </tr>
+      <tr>
+        <th scope="row">Téléphone</th>
+        <td>{hebergeur.telephone ?? <AConfirmer quoi="téléphone de l’hébergeur" />}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="activite">Activité de formation</h2>
+  {
+    editrice.declarationActivite ? (
+      <p>
+        Déclaration d’activité enregistrée sous le numéro{' '}
+        {editrice.declarationActivite} auprès du préfet de région. Cet
+        enregistrement ne vaut pas agrément de l’État.
+      </p>
+    ) : (
+      <p>
+        La Seconde Blouse n’est pas un organisme de formation certifié Qualiopi
+        et le programme n’est pas enregistré au RNCP. Il n’est éligible ni au
+        compte personnel de formation (CPF), ni à un financement France Travail.{' '}
+        <AConfirmer quoi="statut d’organisme de formation à confirmer" />
+      </p>
+    )
+  }
+
+  <h2 id="propriete">Propriété intellectuelle</h2>
+  <p>
+    L’ensemble des contenus de ce site (textes, mise en page, éléments
+    graphiques, supports pédagogiques) est protégé par le droit d’auteur. Toute
+    reproduction ou diffusion, totale ou partielle, sans autorisation écrite
+    préalable est interdite.
+  </p>
+
+  <h2 id="donnees">Données personnelles</h2>
+  <p>
+    Le traitement des données personnelles est décrit dans notre{' '}
+    <a href="/confidentialite">politique de confidentialité</a>. Les traceurs
+    éventuellement déposés sont détaillés sur la page{' '}
+    <a href="/cookies">cookies</a>.
+  </p>
+
+  <h2 id="responsabilite">Limitation de responsabilité</h2>
+  <p>
+    Les informations publiées sur {site.nom} sont fournies à titre informatif.
+    Le closing est une activité indépendante rémunérée à la commission&nbsp;: les
+    revenus dépendent de l’activité réelle de chacun et peuvent être nuls. La
+    Seconde Blouse ne garantit ni mission, ni contrat, ni niveau de revenu, et
+    ne fournit aucun accompagnement médical ou psychologique.
+  </p>
+</Legal>

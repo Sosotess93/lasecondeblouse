@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+/* Polices auto-hébergées depuis /public/fonts (RGPD + performance).
+   Pas de CDN Google Fonts. Les fichiers viennent de Fontsource mais sont
+   déclarés à la main : on ne sert que les sous-ensembles latin / latin-ext,
+   et les URL restent stables, ce qui permet de précharger en <head>.
+
+   Fraunces : variante « standard » (wght + opsz), 67 ko en latin contre
+   121 ko pour « full ». L'axe opsz est celui qui compte en display. */
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/fonts/fraunces-latin-standard-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/fonts/fraunces-latin-ext-standard-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("/fonts/atkinson-hyperlegible-next-latin-ext-wght-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme {
+  /* Palette alignée sur l'identité déjà installée sur Instagram : papier
+     crème, doré chaud, sauge. Elle remplace le bleu de bloc de spec/05.
+     L'argument de spec/05 contre le beige visait le « template
+     infopreneur » ; il ne tient pas ici, où la totalité du trafic vient de
+     la bio Instagram : une rupture chromatique à l'arrivée sur le site se
+     lit comme un changement d'entreprise. La sobriété du positionnement est
+     tenue par la mise en page et le ton, pas par la teinte. */
+
+  /* Encre : texte principal et fonds sombres. Brun profond, jamais noir. */
+  --color-encre-900: #2a2219;
+  --color-encre-700: #4b4136;
+  --color-encre-500: #736753;
+  --color-encre-200: #c9c0ae;
+
+  /* Papier : fond principal, crème chaud */
+  --color-papier-50: #fbf9f3;
+  --color-papier-100: #f2ede2;
+  --color-papier-200: #e3daca;
+
+  /* Doré, accent unique : CTA, focus, marqueurs de séquence.
+     `or-500` sert aux bordures, marqueurs et cellules, jamais au texte :
+     il n'atteint pas AA sur papier. Pour du texte doré, `or-600`.
+     Les fonds de bouton partent de `or-600` : c'est la teinte la plus claire
+     qui tienne le blanc à 4,5:1 (4,79:1). Sur `or-500`, le blanc tombe à
+     3,26:1 et échoue. */
+  --color-or-500: #a98a4f;
+  --color-or-600: #8b6e38;
+  --color-or-700: #6f5729;
+  --color-or-100: #f0e5ce;
+
+  /* Sauge : cellules du planning libérées, états positifs */
+  --color-sauge-400: #a9bba3;
+
+  --color-craie: #ffffff;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --container-page: 1180px;
+
+  /* Écart assumé avec spec/05 (max 4.25rem) : le conteneur est plafonné à
+     1180px et le H1 occupe 7 colonnes, soit ~620px. À 68px, la promesse
+     tient sur six lignes et repousse le CTA principal sous la ligne de
+     flottaison en 1280×720. À 48px elle tient en quatre lignes, comme le
+     wireframe de spec/03. */
+  --text-display: clamp(2.1rem, 4.2vw, 3rem);
+  --text-h2: clamp(1.75rem, 4vw, 2.75rem);
+  --text-h3: clamp(1.15rem, 2vw, 1.4rem);
+  --text-lead: clamp(1.05rem, 2vw, 1.3rem);
+  --text-body: 1.0625rem;
+  --text-label: 0.75rem;
+
+  --ease-sortie: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compense le header sticky sur les ancres */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-papier-50);
+    color: var(--color-encre-900);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.7;
+    font-variant-ligatures: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-variation-settings: "opsz" 96, "SOFT" 20;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    line-height: 1.05;
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+    line-height: 1.15;
+  }
+
+  h3 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--text-h3);
+    line-height: 1.35;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Focus visible partout, jamais d'outline:none sans remplacement. */
+  :where(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-encre-900);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Sur fond sombre, l'outline encre disparaît : on bascule en doré. */
+  .sur-sombre
+    :where(a, button, summary, input, select, [tabindex]):focus-visible {
+    outline-color: var(--color-or-500);
+  }
+
+  ::selection {
+    background-color: var(--color-or-100);
+    color: var(--color-encre-900);
+  }
+}
+
+@layer components {
+  /* Largeur de ligne, non négociable pour cette audience. */
+  .mesure {
+    max-width: 62ch;
+  }
+
+  .mesure-large {
+    max-width: 72ch;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .lead {
+    font-size: var(--text-lead);
+    line-height: 1.6;
+  }
+
+  /* Boutons : définis une seule fois ici, pas dupliqués dans chaque
+     composant. Les quatre copies précédentes avaient déjà commencé à
+     diverger sur la couleur du texte. */
+  .bouton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.875rem 1.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    text-decoration: none;
+    transition:
+      background-color 150ms,
+      border-color 150ms,
+      transform 150ms;
+  }
+
+  .bouton-compact {
+    padding: 0.625rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .bouton-primaire {
+    background-color: var(--color-or-600);
+    color: var(--color-craie);
+  }
+
+  .bouton-primaire:hover {
+    background-color: var(--color-or-700);
+    transform: translateY(-1px);
+  }
+
+  .bouton-secondaire {
+    background-color: transparent;
+    border: 1px solid var(--color-encre-500);
+    color: var(--color-encre-700);
+  }
+
+  .bouton-secondaire:hover {
+    background-color: var(--color-papier-100);
+    transform: translateY(-1px);
+  }
+
+  .bouton:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .bouton:disabled:hover {
+    transform: none;
+    background-color: var(--color-or-600);
+  }
+
+  /* Révélation au scroll : titres de section uniquement, une seule fois. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 600ms var(--ease-sortie),
+      transform 600ms var(--ease-sortie);
+  }
+
+  .reveal.est-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Sécurité : si JS est absent, rien ne reste masqué. */
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

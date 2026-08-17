@@ -1,0 +1,70 @@
+---
+import Section from '../layout/Section.astro';
+import { ressourceSoutien } from '../../data/site';
+
+const constats = [
+  {
+    titre: 'Le temps',
+    corps:
+      'Les week-ends, les nuits, les rappels sur repos. Vous organisez votre vie autour d’un planning que vous découvrez.',
+  },
+  {
+    titre: 'Le sens',
+    corps:
+      'Vous savez ce qu’est un bon soin. Vous n’avez plus les moyens de le donner. C’est ça qui use, plus que la fatigue.',
+  },
+  {
+    titre: 'La reconnaissance',
+    corps:
+      'Dix ans d’ancienneté, des responsabilités qui ne figurent sur aucune fiche de poste, et une grille indiciaire qui ne bouge pas.',
+  },
+  {
+    titre: 'Les portes de sortie',
+    corps:
+      'Le libéral demande un investissement et une patientèle. La dispo se refuse. Reprendre des études à 35 ans avec deux enfants n’est pas une option pour tout le monde.',
+  },
+];
+---
+
+<Section id="le-constat" titre="Ce n’est pas vous qui lâchez.">
+  <p class="lead mesure text-encre-700">
+    Vous n’avez pas perdu la vocation. Vous avez perdu les conditions de
+    l’exercer.
+  </p>
+
+  <div class="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      constats.map((constat) => (
+        <div class="border-t border-papier-200 pt-5">
+          <h3 class="mb-2">{constat.titre}</h3>
+          <p class="text-encre-700">{constat.corps}</p>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="mt-14 mesure text-encre-900">
+    La question n’est pas de savoir si vous tiendrez encore. C’est de savoir ce
+    que vous faites de dix ans de compétences que personne, à l’extérieur, ne
+    sait valoriser.
+  </p>
+
+  {/* Encadré obligatoire, cf. spec/02-conformite.md §7. Discret, non alarmiste. */}
+  <aside
+    class="mt-12 mesure-large rounded-[4px] border border-papier-200 bg-papier-100 p-6 md:p-7"
+  >
+    <p class="text-[0.9375rem] leading-relaxed text-encre-700">
+      <strong class="font-semibold text-encre-900">Une précision.</strong> Ce
+      programme est une reconversion professionnelle, pas un accompagnement
+      médical. Si vous traversez une période difficile, l’association {
+        ressourceSoutien.nom
+      } propose une ligne d’écoute gratuite et confidentielle au{' '}
+      <a
+        href={ressourceSoutien.telephoneLien}
+        class="font-semibold whitespace-nowrap text-encre-900 underline underline-offset-2"
+        >{ressourceSoutien.telephone}</a
+      >, 24h/24, tenue par des professionnels de santé. En parler à un médecin du
+      travail est aussi une démarche possible, et protégée.
+    </p>
+  </aside>
+</Section>

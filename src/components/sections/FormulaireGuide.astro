@@ -1,0 +1,186 @@
+---
+import Field from '../ui/Field.astro';
+import { contact, professions } from '../../data/site';
+
+const emailContact = contact.email ?? 'notre adresse de contact';
+---
+
+<div
+  data-formulaire-guide
+  class="rounded-[4px] border border-papier-200 bg-craie p-6 md:p-8"
+>
+  <form novalidate class="space-y-5" data-etape="repos">
+    <Field nom="prenom" label="Prénom" requis autocomplete="given-name" />
+    <Field
+      nom="email"
+      label="Adresse e-mail"
+      type="email"
+      requis
+      autocomplete="email"
+    />
+    <Field
+      nom="profession"
+      label="Votre profession"
+      type="select"
+      requis
+      options={professions.map((p) => ({ valeur: p.valeur, label: p.label }))}
+    />
+
+    {/* Honeypot : invisible, hors tabulation, jamais renseigné par un humain. */}
+    <div aria-hidden="true" class="absolute -left-[9999px]">
+      <label for="societe">Société</label>
+      <input id="societe" name="societe" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="flex gap-3 pt-1">
+      <input
+        id="consentement"
+        name="consentement"
+        type="checkbox"
+        required
+        class="mt-1 h-5 w-5 shrink-0 rounded-[2px] border border-papier-200 accent-encre-700"
+      />
+      <label for="consentement" class="text-[0.9375rem] leading-relaxed text-encre-700">
+        J’accepte de recevoir le guide et les e-mails de La Seconde Blouse.
+        Désinscription en un clic à tout moment.
+        <a href="/confidentialite" class="underline underline-offset-2">
+          Politique de confidentialité
+        </a>
+      </label>
+    </div>
+    <p
+      data-erreur-champ="consentement"
+      aria-live="polite"
+      class="text-[0.875rem] text-or-600 empty:hidden"
+    >
+    </p>
+
+    <button
+      type="submit"
+      data-bouton-envoi
+      data-evt="guide_soumis"
+      class="bouton bouton-primaire w-full sm:w-auto"
+    >
+      Recevoir le guide
+    </button>
+
+    <p
+      data-message-global
+      role="status"
+      aria-live="polite"
+      class="text-[0.9375rem] text-encre-700 empty:hidden"
+    >
+    </p>
+  </form>
+</div>
+
+<script is:inline define:vars={{ emailContact }}>
+  const bloc = document.querySelector('[data-formulaire-guide]');
+  const formulaire = bloc?.querySelector('form');
+  if (formulaire) {
+    const bouton = formulaire.querySelector('[data-bouton-envoi]');
+    const messageGlobal = formulaire.querySelector('[data-message-global]');
+    const rendu = Date.now();
+
+    const erreurDe = (champ) =>
+      formulaire.querySelector(`[data-erreur-champ="${champ}"]`);
+
+    const viderErreurs = () => {
+      formulaire
+        .querySelectorAll('[data-erreur-champ]')
+        .forEach((element) => (element.textContent = ''));
+      formulaire
+        .querySelectorAll('[aria-invalid]')
+        .forEach((element) => element.removeAttribute('aria-invalid'));
+    };
+
+    const poserErreur = (champ, message) => {
+      const cible = erreurDe(champ);
+      if (cible) cible.textContent = message;
+      const controle = formulaire.elements.namedItem(champ);
+      if (controle && 'setAttribute' in controle) {
+        controle.setAttribute('aria-invalid', 'true');
+      }
+    };
+
+    formulaire.addEventListener('submit', async (evenement) => {
+      evenement.preventDefault();
+      viderErreurs();
+      if (messageGlobal) messageGlobal.textContent = '';
+
+      const donnees = new FormData(formulaire);
+      const charge = {
+        prenom: String(donnees.get('prenom') ?? '').trim(),
+        email: String(donnees.get('email') ?? '').trim(),
+        profession: String(donnees.get('profession') ?? ''),
+        consentement: donnees.get('consentement') === 'on',
+        societe: String(donnees.get('societe') ?? ''),
+        rendu,
+      };
+
+      // Validation côté client : messages de spec/04-copy.md §Micro-copy.
+      let valide = true;
+      if (charge.prenom.length < 2) {
+        poserErreur('prenom', 'Ce champ est nécessaire pour vous envoyer le guide.');
+        valide = false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(charge.email)) {
+        poserErreur('email', 'Cette adresse e-mail semble incomplète.');
+        valide = false;
+      }
+      if (!charge.profession) {
+        poserErreur('profession', 'Ce champ est nécessaire pour vous envoyer le guide.');
+        valide = false;
+      }
+      if (!charge.consentement) {
+        poserErreur(
+          'consentement',
+          'Votre accord est nécessaire pour vous envoyer le guide.'
+        );
+        valide = false;
+      }
+      if (!valide) {
+        formulaire.querySelector('[aria-invalid="true"]')?.focus();
+        return;
+      }
+
+      const libelleInitial = bouton?.textContent ?? 'Recevoir le guide';
+      if (bouton) {
+        bouton.disabled = true;
+        bouton.textContent = 'Envoi…';
+      }
+
+      try {
+        const reponse = await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(charge),
+        });
+        const resultat = await reponse.json().catch(() => ({ ok: false }));
+
+        if (resultat.ok) {
+          window.lsbTrack?.('guide_soumis', { page: location.pathname });
+          window.location.assign('/guide/merci');
+          return;
+        }
+
+        if (resultat.champ) {
+          poserErreur(resultat.champ, resultat.message);
+        } else if (messageGlobal) {
+          messageGlobal.textContent =
+            resultat.message ??
+            `L’envoi n’a pas abouti. Réessayez, ou écrivez-nous à ${emailContact}.`;
+        }
+      } catch {
+        if (messageGlobal) {
+          messageGlobal.textContent = `L’envoi n’a pas abouti. Réessayez, ou écrivez-nous à ${emailContact}.`;
+        }
+      } finally {
+        if (bouton) {
+          bouton.disabled = false;
+          bouton.textContent = libelleInitial;
+        }
+      }
+    });
+  }
+</script>

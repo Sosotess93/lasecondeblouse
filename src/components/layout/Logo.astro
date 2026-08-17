@@ -1,0 +1,49 @@
+---
+/**
+ * Marque géométrique : une cellule de roulement barrée d’un trait.
+ *
+ * Sert de repli quand le logo de marque n’est pas disponible, et de base au
+ * favicon. Lisible à n’importe quelle taille, contrairement au logo complet.
+ */
+
+interface Props {
+  class?: string;
+  /** Masque le mot sous 640px, pour tenir à côté du bouton d’appel. */
+  marqueSeuleSurMobile?: boolean;
+}
+
+const { class: classe = '', marqueSeuleSurMobile = false } = Astro.props;
+---
+
+<span class:list={['inline-flex items-center gap-2.5', classe]}>
+  <svg
+    width="26"
+    height="26"
+    viewBox="0 0 26 26"
+    fill="none"
+    aria-hidden="true"
+    class="shrink-0"
+  >
+    <rect
+      x="1"
+      y="1"
+      width="24"
+      height="24"
+      rx="2"
+      stroke="currentColor"
+      stroke-width="1.5"></rect>
+    <path
+      d="M6.5 16.5 19.5 6.5"
+      stroke="var(--color-or-500)"
+      stroke-width="2"
+      stroke-linecap="square"></path>
+  </svg>
+  <span
+    class:list={[
+      'font-display text-[1.0625rem] leading-none tracking-[-0.01em] whitespace-nowrap',
+      marqueSeuleSurMobile && 'hidden sm:inline',
+    ]}
+  >
+    La Seconde Blouse
+  </span>
+</span>

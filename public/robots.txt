@@ -1,0 +1,53 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+# Crawlers des moteurs génératifs — autorisés explicitement.
+# C'est la condition d'existence du GEO : sans accès, pas de citation.
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /guide/merci
+
+Sitemap: https://lasecondeblouse.fr/sitemap-index.xml

@@ -1,0 +1,162 @@
+---
+/**
+ * Bandeau de consentement maison (cf. spec/09-tracking-rgpd.md).
+ *
+ * Règles appliquées :
+ * - aucun dépôt ni requête tierce avant action de l’utilisateur ;
+ * - « Refuser » et « Accepter » ont exactement le même poids visuel ;
+ * - choix mémorisé 6 mois, révocable depuis /cookies ;
+ * - pas de mur de cookies : le site fonctionne intégralement sans consentement.
+ *
+ * Si aucune clé PostHog n’est configurée, aucun traceur n’existe : le bandeau
+ * ne s’affiche pas du tout, ce qui est le cas par défaut.
+ */
+
+const clePosthog = import.meta.env.PUBLIC_POSTHOG_KEY ?? '';
+const hotePosthog = import.meta.env.PUBLIC_POSTHOG_HOST ?? '';
+const mesureActive = Boolean(clePosthog && hotePosthog);
+---
+
+<div
+  data-bandeau-cookies
+  hidden
+  role="dialog"
+  aria-labelledby="cookies-titre"
+  aria-describedby="cookies-corps"
+  class="fixed inset-x-0 bottom-0 z-[55] border-t border-papier-200 bg-craie p-5 shadow-[0_-2px_16px_rgba(10,43,49,0.08)] md:inset-x-auto md:right-6 md:bottom-6 md:max-w-[26rem] md:rounded-[4px] md:border"
+>
+  <h2 id="cookies-titre" class="font-body text-[1rem] font-semibold">
+    Mesure d’audience
+  </h2>
+  <p id="cookies-corps" class="mt-2 text-[0.9375rem] leading-relaxed text-encre-700">
+    On mesure la fréquentation du site pour savoir quelles pages sont utiles.
+    Rien n’est déposé sans votre accord.
+  </p>
+  <div class="mt-4 flex gap-3">
+    <button
+      type="button"
+      data-cookies-refuser
+      class="min-h-[44px] flex-1 rounded-[4px] border border-encre-500 px-4 py-2.5 font-semibold text-encre-700 transition-colors duration-150 hover:bg-papier-100"
+    >
+      Refuser
+    </button>
+    <button
+      type="button"
+      data-cookies-accepter
+      class="min-h-[44px] flex-1 rounded-[4px] border border-encre-500 px-4 py-2.5 font-semibold text-encre-700 transition-colors duration-150 hover:bg-papier-100"
+    >
+      Accepter
+    </button>
+  </div>
+  <p class="mt-3 text-[0.8125rem] text-encre-500">
+    <a href="/cookies" class="underline underline-offset-2">En savoir plus</a>
+  </p>
+</div>
+
+<script is:inline define:vars={{ clePosthog, hotePosthog, mesureActive }}>
+  const CLE_STOCKAGE = 'lsb-consentement-mesure';
+  const DUREE_MS = 1000 * 60 * 60 * 24 * 182; // ~6 mois
+
+  const bandeau = document.querySelector('[data-bandeau-cookies]');
+
+  function lireChoix() {
+    try {
+      const brut = localStorage.getItem(CLE_STOCKAGE);
+      if (!brut) return null;
+      const choix = JSON.parse(brut);
+      if (!choix || typeof choix.date !== 'number') return null;
+      if (Date.now() - choix.date > DUREE_MS) {
+        localStorage.removeItem(CLE_STOCKAGE);
+        return null;
+      }
+      return choix.accepte === true ? 'accepte' : 'refuse';
+    } catch {
+      return null;
+    }
+  }
+
+  function ecrireChoix(accepte) {
+    try {
+      localStorage.setItem(
+        CLE_STOCKAGE,
+        JSON.stringify({ accepte, date: Date.now() })
+      );
+    } catch {
+      /* Mode privé, quota plein : on n’insiste pas. */
+    }
+  }
+
+  // File d’attente : les événements émis avant le consentement sont perdus
+  // volontairement, pas rejoués. On ne conserve rien sans accord.
+  window.lsbTrack = function () {};
+
+  let mesureChargee = false;
+
+  function activerMesure() {
+    if (!mesureActive || mesureChargee) return;
+    mesureChargee = true;
+
+    const script = document.createElement('script');
+    script.src = `${hotePosthog.replace(/\/$/, '')}/static/array.js`;
+    script.async = true;
+    script.onload = () => {
+      window.posthog?.init(clePosthog, {
+        api_host: hotePosthog,
+        // Sans cookie ni identifiant persistant : la mesure reste
+        // cantonnée à la session en cours.
+        persistence: 'memory',
+        autocapture: false,
+        capture_pageview: true,
+        disable_session_recording: true,
+        ip: false,
+      });
+      window.lsbTrack = (evenement, proprietes) => {
+        window.posthog?.capture(evenement, proprietes);
+      };
+    };
+    document.head.appendChild(script);
+  }
+
+  function masquer() {
+    if (bandeau) bandeau.hidden = true;
+  }
+
+  function afficher() {
+    if (bandeau) bandeau.hidden = false;
+  }
+
+  const choix = lireChoix();
+
+  if (!mesureActive) {
+    // Aucun traceur configuré : rien à consentir.
+    masquer();
+  } else if (choix === 'accepte') {
+    masquer();
+    activerMesure();
+  } else if (choix === 'refuse') {
+    masquer();
+  } else {
+    afficher();
+  }
+
+  bandeau?.querySelector('[data-cookies-accepter]')?.addEventListener('click', () => {
+    ecrireChoix(true);
+    masquer();
+    activerMesure();
+  });
+
+  bandeau?.querySelector('[data-cookies-refuser]')?.addEventListener('click', () => {
+    ecrireChoix(false);
+    masquer();
+  });
+
+  // Point d’entrée utilisé par /cookies pour revenir sur son choix.
+  window.lsbOuvrirPreferences = () => {
+    try {
+      localStorage.removeItem(CLE_STOCKAGE);
+    } catch {
+      /* ignore */
+    }
+    if (mesureActive) afficher();
+  };
+</script>

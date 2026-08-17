@@ -1,0 +1,22 @@
+---
+/**
+ * Jeton visuel pour une information manquante (phase 0 du backlog).
+ *
+ * Volontairement voyant : un placeholder discret finit en production. Celui-ci
+ * ne peut pas passer inaperçu, et `scripts/check-copy.mjs --strict` fait
+ * échouer le build de production tant qu’il en reste un.
+ */
+
+interface Props {
+  /** Ce qu’il faut obtenir, en un ou deux mots. */
+  quoi: string;
+}
+
+const { quoi } = Astro.props;
+---
+
+<mark
+  class="mx-0.5 inline-block rounded-[2px] bg-or-100 px-1.5 py-0.5 font-mono text-[0.8em] leading-tight tracking-[0.04em] text-or-600"
+  title="Information à confirmer avant mise en ligne"
+  data-a-confirmer>[{quoi}]</mark
+>

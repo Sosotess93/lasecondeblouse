@@ -1,0 +1,184 @@
+---
+import Section from '../layout/Section.astro';
+
+/**
+ * Section la plus convaincante du site : elle transforme dix ans d’hôpital
+ * en actif plutôt qu’en perte. C’est aussi le meilleur actif GEO de la page
+ * (contenu unique, structuré, factuel).
+ *
+ * Un seul markup : <table> sémantique, reconfiguré en cartes par CSS sous
+ * 768px. Pas de duplication.
+ */
+const correspondances = [
+  {
+    hopital:
+      'L’entretien d’accueil : recueillir une situation complète en dix minutes avec quelqu’un qui vous parle mal',
+    closing: 'La phase de découverte, qui décide de tout le reste de l’appel',
+  },
+  {
+    hopital: 'Reformuler pour vérifier qu’on a compris',
+    closing: 'Le geste technique central du métier',
+  },
+  {
+    hopital: 'Annoncer une nouvelle difficile sans se dérober',
+    closing: 'Annoncer un prix, tenir une position',
+  },
+  {
+    hopital:
+      'Un patient qui refuse un soin : comprendre le refus au lieu de le contourner',
+    closing: 'Traiter une objection sans la balayer',
+  },
+  {
+    hopital: 'Tenir un appel de la famille en pleine urgence',
+    closing: 'Rester posé quand l’échange se tend',
+  },
+  {
+    hopital: 'Le secret professionnel, le refus d’un acte inadapté',
+    closing: 'Savoir dire non à une vente qui n’a pas lieu d’être',
+  },
+  {
+    hopital: 'Les transmissions : tracer pour celui qui prend la suite',
+    closing: 'Le suivi et les comptes-rendus au client',
+  },
+];
+---
+
+<Section
+  id="vos-competences"
+  tone="sombre"
+  eyebrow="Ce que vous savez déjà faire"
+  titre="Vous avez passé dix ans à vous former à ce métier sans le savoir."
+>
+  <p class="lead mesure text-encre-200">
+    Un closeur passe l’essentiel de son temps à écouter, reformuler, rassurer et
+    poser un cadre. Vous faites ça depuis votre première année de service.
+  </p>
+
+  <table class="tableau-competences mt-12">
+    <caption class="sr-only">
+      Correspondance entre les compétences exercées à l’hôpital et celles du
+      métier de closeur
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">À l’hôpital</th>
+        <th scope="col">En closing</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        correspondances.map((ligne) => (
+          <tr>
+            <td data-libelle="À l’hôpital">{ligne.hopital}</td>
+            <td data-libelle="En closing">{ligne.closing}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <p class="mt-12 mesure text-encre-200">
+    Ce qui vous manque, ce n’est pas la compétence humaine. C’est le vocabulaire
+    d’un autre secteur, une méthode d’entretien structurée et un statut
+    d’indépendant. Ça s’apprend, et c’est exactement ce que couvre le programme.
+  </p>
+</Section>
+
+<style>
+  .tableau-competences {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .tableau-competences th {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-or-100);
+    padding-bottom: 0.75rem;
+    vertical-align: bottom;
+  }
+
+  .tableau-competences td {
+    padding: 1.25rem 0;
+    vertical-align: top;
+    border-top: 1px solid var(--color-encre-700);
+    line-height: 1.6;
+  }
+
+  /* Desktop : règle verticale entre les deux colonnes. */
+  @media (min-width: 768px) {
+    .tableau-competences th:first-child,
+    .tableau-competences td:first-child {
+      width: 52%;
+      padding-right: 2.5rem;
+      border-right: 1px solid var(--color-encre-700);
+      color: var(--color-encre-200);
+    }
+
+    .tableau-competences th:last-child,
+    .tableau-competences td:last-child {
+      padding-left: 2.5rem;
+      color: var(--color-papier-50);
+    }
+  }
+
+  /* Mobile : chaque paire devient une carte. Même markup, CSS seul. */
+  @media (max-width: 767px) {
+    .tableau-competences thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .tableau-competences tbody,
+    .tableau-competences tr,
+    .tableau-competences td {
+      display: block;
+    }
+
+    .tableau-competences tr {
+      margin-bottom: 1.5rem;
+      border-top: 1px solid var(--color-encre-700);
+      padding-top: 1.25rem;
+    }
+
+    .tableau-competences td {
+      border-top: 0;
+      padding: 0;
+    }
+
+    .tableau-competences td::before {
+      content: attr(data-libelle);
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-encre-200);
+      margin-bottom: 0.375rem;
+    }
+
+    .tableau-competences td:first-child {
+      color: var(--color-encre-200);
+    }
+
+    .tableau-competences td:last-child {
+      margin-top: 1rem;
+      margin-left: 1rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--color-or-500);
+      color: var(--color-papier-50);
+    }
+
+    .tableau-competences td:last-child::before {
+      color: var(--color-or-100);
+    }
+  }
+</style>

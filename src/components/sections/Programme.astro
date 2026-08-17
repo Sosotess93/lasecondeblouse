@@ -1,0 +1,101 @@
+---
+import Section from '../layout/Section.astro';
+import PhaseRow from '../planning/PhaseRow.astro';
+import AConfirmer from '../ui/AConfirmer.astro';
+import { programme } from '../../data/site';
+
+interface Props {
+  eyebrow?: string;
+  titre?: string;
+  titreH1?: boolean;
+}
+
+const {
+  eyebrow = 'Le déroulé',
+  titre = 'Quatre étapes, dans l’ordre.',
+  titreH1 = false,
+} = Astro.props;
+---
+
+<Section id="le-programme" eyebrow={eyebrow} titre={titre} titreH1={titreH1}>
+  <slot name="chapeau" />
+
+  <div class="border-b border-papier-200">
+    <PhaseRow numero="01" titre="Sortir du cadre hospitalier">
+      <p>
+        Avant la technique, il y a ce qui bloque&nbsp;: la culpabilité de partir,
+        l’idée que vendre est sale, le rapport à l’argent dans un métier où on
+        n’en parle jamais. Cette phase se traite en groupe, avec d’autres
+        soignants. C’est celle que les participants sous-estiment et qui décide
+        de la suite.
+      </p>
+    </PhaseRow>
+
+    <PhaseRow numero="02" titre="La méthode">
+      <p>
+        La structure d’un appel de closing, phase par phase. La découverte, la
+        qualification, l’annonce du prix, le traitement des objections, la
+        conclusion. Le cadre éthique&nbsp;: quand refuser une vente, comment le
+        formuler, comment le justifier à son client.
+      </p>
+    </PhaseRow>
+
+    <PhaseRow numero="03" titre="L’entraînement">
+      <p>
+        Des simulations d’appels enregistrées, débriefées une par une. Des mises
+        en situation avec les cas difficiles réels du métier. On répète jusqu’à
+        ce que ce soit fluide. C’est la phase la plus longue, et personne ne
+        passe à la suivante avant d’être prêt.
+      </p>
+    </PhaseRow>
+
+    {/* Renommée depuis « Placement & Emploi », cf. spec/02-conformite.md §2. */}
+    <PhaseRow
+      numero="04"
+      titre="Premiers appels et mise en relation"
+      avertissement="La suite dépend de vos échanges avec eux : nous ne garantissons ni mission, ni contrat, ni revenu."
+    >
+      <p>
+        Le statut d’indépendant, la facturation, les outils. Puis nous vous
+        présentons aux infopreneurs et structures de notre réseau.
+      </p>
+      <p>
+        Ce que nous garantissons, c’est que vous serez présentée, et que vous
+        serez prête à passer l’appel.
+      </p>
+    </PhaseRow>
+  </div>
+
+  <dl
+    class="mt-12 grid gap-x-8 gap-y-6 text-[0.9375rem] sm:grid-cols-2 lg:grid-cols-4"
+  >
+    <div>
+      <dt class="eyebrow mb-1.5 text-encre-500">Durée</dt>
+      <dd>
+        {
+          programme.dureeSemaines ? (
+            `${programme.dureeSemaines} semaines`
+          ) : (
+            <AConfirmer quoi="durée" />
+          )
+        }
+      </dd>
+    </div>
+    <div>
+      <dt class="eyebrow mb-1.5 text-encre-500">Format</dt>
+      <dd>{programme.format ?? <AConfirmer quoi="format" />}</dd>
+    </div>
+    <div>
+      <dt class="eyebrow mb-1.5 text-encre-500">Groupe</dt>
+      <dd>{programme.tailleGroupe ?? <AConfirmer quoi="taille du groupe" />}</dd>
+    </div>
+    <div>
+      <dt class="eyebrow mb-1.5 text-encre-500">Accès</dt>
+      <dd>{programme.dureeAcces ?? <AConfirmer quoi="durée d’accès" />}</dd>
+    </div>
+  </dl>
+
+  <p class="mt-8 mesure text-encre-700">
+    Compatible avec un poste à temps plein, y compris en horaires décalés.
+  </p>
+</Section>

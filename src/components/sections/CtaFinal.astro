@@ -1,0 +1,37 @@
+---
+import Section from '../layout/Section.astro';
+import Button from '../ui/Button.astro';
+---
+
+<Section id="prochaine-etape" titre="Prochaine étape : une conversation.">
+  {/* Jalon analytics : lecture jusqu’au bas de page. */}
+  <div data-jalon="scroll_90"></div>
+
+  <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+    <div>
+      <p class="lead mesure text-encre-700">
+        30 minutes au téléphone pour savoir si ce métier vous correspond.
+        Gratuit, sans engagement, et vous saurez tout, y compris le prix,
+        avant de raccrocher.
+      </p>
+      <div class="mt-8">
+        <Button href="/rdv" evenement="cta_final">
+          Réserver un appel de découverte
+        </Button>
+      </div>
+    </div>
+
+    <div class="rounded-[4px] border border-papier-200 bg-papier-100 p-7">
+      <p class="text-encre-700">
+        Pas encore prête à en parler&nbsp;? Le guide <em
+          >Les métiers du digital accessibles sans reprendre d’études</em
+        > fait le tour des options, closing compris.
+      </p>
+      <div class="mt-6">
+        <Button href="/guide" variante="secondaire" evenement="cta_guide">
+          Recevoir le guide
+        </Button>
+      </div>
+    </div>
+  </div>
+</Section>

@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import Constat from '../components/sections/Constat.astro';
+import Metier from '../components/sections/Metier.astro';
+import Competences from '../components/sections/Competences.astro';
+import Oumaya from '../components/sections/Oumaya.astro';
+import Programme from '../components/sections/Programme.astro';
+import Temoignages from '../components/sections/Temoignages.astro';
+import Transparence from '../components/sections/Transparence.astro';
+import Appel from '../components/sections/Appel.astro';
+import Faq from '../components/sections/Faq.astro';
+import CtaFinal from '../components/sections/CtaFinal.astro';
+import SeparateurPlanning from '../components/planning/SeparateurPlanning.astro';
+import { entreesFaq, schemaFaq } from '../lib/faq';
+import { site } from '../data/site';
+
+const entrees = await entreesFaq('landing');
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${site.url}/#site`,
+    url: site.url,
+    name: site.nom,
+    inLanguage: 'fr-FR',
+    publisher: { '@id': `${site.url}/#organisation` },
+  },
+  schemaFaq(entrees),
+];
+---
+
+<Base
+  titre="La Seconde Blouse · Reconversion des soignants"
+  description="Programme de reconversion pour infirmières, aides-soignantes et professionnels de santé vers le closing éthique. Contenu, tarif et modalités en clair."
+  canonique="/"
+  schema={schema}
+>
+  {/* Le H1 de la page est celui du hero. Un seul par page.
+      Les séparateurs en cellules de planning ne servent qu'entre deux
+      sections de même fond, où le seul espacement vertical se lirait comme
+      un vide plutôt que comme une limite. */}
+  <Hero />
+  <Constat />
+  <SeparateurPlanning />
+  <Metier />
+  <Competences />
+  <Oumaya />
+  <SeparateurPlanning />
+  <Programme />
+  <SeparateurPlanning />
+  <Temoignages limite={3} />
+  <Transparence />
+  <Appel />
+  <Faq page="landing" />
+  <SeparateurPlanning />
+  <CtaFinal />
+</Base>

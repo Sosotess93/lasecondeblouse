@@ -1,0 +1,87 @@
+---
+import Section from '../layout/Section.astro';
+import Button from '../ui/Button.astro';
+import { appel } from '../../data/site';
+
+const temps = [
+  {
+    numero: '1',
+    titre: 'Votre situation',
+    minutes: 10,
+    corps:
+      'Votre poste, votre ancienneté, ce qui vous amène, votre disponibilité réelle par semaine.',
+  },
+  {
+    numero: '2',
+    titre: 'Les questions',
+    minutes: 10,
+    corps: 'Les vôtres, sur le métier, le quotidien, ce qui est difficile.',
+  },
+  {
+    numero: '3',
+    titre: 'Le programme',
+    minutes: 5,
+    corps:
+      'Le contenu, la durée, le tarif, les modalités. Aucune information réservée à la fin.',
+  },
+  {
+    numero: '4',
+    titre: 'Votre décision',
+    minutes: 5,
+    corps:
+      'Vous n’êtes pas obligée de décider pendant l’appel. Si vous voulez y réfléchir, on raccroche et vous nous recontactez quand vous voulez. Le tarif sera le même.',
+  },
+];
+
+/* Le total doit correspondre à la durée annoncée du créneau Cal.com. */
+const total = temps.reduce((somme, item) => somme + item.minutes, 0);
+if (total !== appel.dureeMinutes) {
+  throw new Error(
+    `Le déroulé de l’appel totalise ${total} min alors que le créneau annoncé en dure ${appel.dureeMinutes}. Corriger l’un ou l’autre avant de publier.`
+  );
+}
+---
+
+<Section
+  id="l-appel"
+  tone="sombre"
+  eyebrow="L’appel de découverte"
+  titre="Comment se passe l’appel"
+>
+  <p class="lead mesure text-encre-200">
+    Autant l’annoncer&nbsp;: c’est un appel pendant lequel on vous présente un
+    programme payant. Ce n’est pas un «&nbsp;bilan de compétences
+    offert&nbsp;». Voilà exactement ce qui s’y passe.
+  </p>
+
+  <ol class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      temps.map((item) => (
+        <li class="border-t border-encre-700 pt-5">
+          <div class="mb-3 flex items-baseline justify-between gap-3">
+            <span
+              class="inline-flex h-7 w-7 items-center justify-center rounded-[2px] border border-or-500 font-mono text-[0.75rem] text-or-100"
+              aria-hidden="true"
+            >
+              {item.numero}
+            </span>
+            <span class="font-mono text-[0.75rem] tracking-[0.08em] text-encre-200">
+              {item.minutes} min
+            </span>
+          </div>
+          <h3 class="mb-2 text-papier-50">{item.titre}</h3>
+          <p class="text-encre-200">{item.corps}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="mt-12 mesure text-papier-50">
+    Il arrive qu’on vous dise que ce n’est pas le bon moment, ou pas le bon
+    programme pour vous. C’est le principe.
+  </p>
+
+  <div class="mt-9">
+    <Button href="/rdv" evenement="cta_appel">Choisir un créneau</Button>
+  </div>
+</Section>

@@ -1,0 +1,190 @@
+---
+import Legal from '../layouts/Legal.astro';
+import AConfirmer from '../components/ui/AConfirmer.astro';
+import { contact, editrice } from '../data/site';
+
+const traitements = [
+  {
+    traitement: 'Formulaire de demande du guide',
+    donnees: 'Prénom, adresse e-mail, profession',
+    finalite: 'Envoi du guide et de la séquence e-mail associée',
+    base: 'Consentement (art. 6.1.a RGPD)',
+    duree: '3 ans sans interaction de votre part',
+  },
+  {
+    traitement: 'Prise de rendez-vous et demande de rappel',
+    donnees:
+      'Nom, adresse e-mail, téléphone, profession, moment de disponibilité, message facultatif',
+    finalite: "Organisation et tenue de l’appel de découverte",
+    base: 'Mesures précontractuelles (art. 6.1.b RGPD)',
+    duree: '3 ans',
+  },
+  {
+    traitement: "Mesure d’audience",
+    donnees: 'Pages consultées, données techniques agrégées, sans identifiant persistant',
+    finalite: 'Comprendre quelles pages sont utiles et améliorer le site',
+    base: 'Consentement',
+    duree: '13 mois maximum',
+  },
+  {
+    traitement: 'Participants au programme',
+    donnees: 'Identité, coordonnées, éléments de facturation',
+    finalite: 'Exécution du contrat et obligations comptables',
+    base: 'Contrat et obligation légale',
+    duree: '10 ans (obligations comptables)',
+  },
+];
+
+const sousTraitants = [
+  {
+    nom: 'Brevo (Sendinblue SAS)',
+    role: 'Envoi des e-mails et gestion des contacts',
+    lieu: 'France, Union européenne',
+  },
+  {
+    nom: 'Cal.com',
+    role: 'Prise de rendez-vous en ligne',
+    lieu: 'États-Unis, clauses contractuelles types',
+  },
+  {
+    nom: 'Vercel Inc.',
+    role: 'Hébergement du site',
+    lieu: 'États-Unis, clauses contractuelles types',
+  },
+];
+
+const droits = [
+  'accès à vos données',
+  'rectification des données inexactes',
+  'effacement',
+  "limitation du traitement",
+  'opposition au traitement',
+  'portabilité',
+  'retrait de votre consentement à tout moment, sans que cela remette en cause la licéité du traitement effectué avant ce retrait',
+];
+---
+
+<Legal
+  titre="Politique de confidentialité · La Seconde Blouse"
+  description="Quelles données nous collectons, pourquoi, combien de temps nous les conservons, et comment exercer vos droits."
+  canonique="/confidentialite"
+  h1="Politique de confidentialité"
+>
+  <p>
+    Ce site s’adresse à des professionnels de santé et touche à leur situation
+    professionnelle. Nous appliquons donc une règle simple&nbsp;: ne collecter
+    que ce qui est nécessaire, ne rien revendre, et ne partager aucune donnée à
+    des fins publicitaires. Aucun pixel publicitaire (Meta, TikTok, Google Ads)
+    n’est présent sur ce site.
+  </p>
+
+  <h2 id="responsable">Responsable de traitement</h2>
+  <p>
+    {editrice.raisonSociale ?? <AConfirmer quoi="raison sociale" />}, dont les
+    coordonnées figurent dans les{' '}
+    <a href="/mentions-legales">mentions légales</a>. Contact pour toute
+    question relative aux données&nbsp;:{' '}
+    {
+      contact.emailDonnees ? (
+        <a href={`mailto:${contact.emailDonnees}`}>{contact.emailDonnees}</a>
+      ) : (
+        <AConfirmer quoi="adresse dédiée aux données" />
+      )
+    }
+  </p>
+
+  <h2 id="traitements">Traitements réalisés</h2>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Traitement</th>
+        <th scope="col">Données</th>
+        <th scope="col">Finalité</th>
+        <th scope="col">Base légale</th>
+        <th scope="col">Conservation</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        traitements.map((ligne) => (
+          <tr>
+            <th scope="row">{ligne.traitement}</th>
+            <td>{ligne.donnees}</td>
+            <td>{ligne.finalite}</td>
+            <td>{ligne.base}</td>
+            <td>{ligne.duree}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <h2 id="minimisation">Ce que nous ne collectons pas</h2>
+  <p>
+    Nous n’enregistrons pas votre navigation individuelle, nous n’utilisons pas
+    d’enregistrement de session, et nous ne suivons pas le contenu saisi dans
+    les champs de formulaire. Le champ «&nbsp;profession&nbsp;» sert uniquement à
+    adapter le contenu des e-mails&nbsp;; il n’est jamais transmis à un tiers à
+    des fins commerciales.
+  </p>
+
+  <h2 id="sous-traitants">Destinataires et sous-traitants</h2>
+  <p>
+    Vos données sont accessibles à l’éditrice du site et aux prestataires
+    suivants, dans la limite de leur mission&nbsp;:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Prestataire</th>
+        <th scope="col">Rôle</th>
+        <th scope="col">Localisation</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        sousTraitants.map((ligne) => (
+          <tr>
+            <th scope="row">{ligne.nom}</th>
+            <td>{ligne.role}</td>
+            <td>{ligne.lieu}</td>
+          </tr>
+        ))
+      }
+      <tr>
+        <th scope="row">Prestataire de paiement</th>
+        <td>Encaissement du programme</td>
+        <td>
+          <AConfirmer quoi="prestataire de paiement" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="droits">Vos droits</h2>
+  <p>Vous disposez des droits suivants&nbsp;:</p>
+  <ul>
+    {droits.map((droit) => <li>{droit}</li>)}
+  </ul>
+  <p>
+    Pour les exercer, écrivez à l’adresse indiquée ci-dessus. Une réponse vous
+    sera apportée dans un délai d’un mois. Vous pouvez également introduire une
+    réclamation auprès de la{' '}
+    <a href="https://www.cnil.fr/fr/plaintes" rel="noopener noreferrer" target="_blank">
+      CNIL
+    </a>.
+  </p>
+
+  <h2 id="desinscription">Désinscription</h2>
+  <p>
+    Chaque e-mail comporte un lien de désinscription fonctionnel en un clic. La
+    désinscription est immédiate et n’entraîne aucune conséquence sur les autres
+    échanges que vous pourriez avoir avec nous.
+  </p>
+
+  <h2 id="cookies">Traceurs</h2>
+  <p>
+    Le détail des traceurs et le moyen de revenir sur votre choix figurent sur
+    la page <a href="/cookies">cookies</a>.
+  </p>
+</Legal>

@@ -1,0 +1,82 @@
+---
+import type { Poste } from './roulement';
+
+interface Props {
+  valeur: Poste;
+  etat: 'remplie' | 'repos' | 'liberee';
+  /** Décalage de la cascade, en millisecondes. */
+  delai?: number;
+  class?: string;
+}
+
+const { valeur, etat, delai = 0, class: classe = '' } = Astro.props;
+---
+
+<span
+  class:list={['cellule', classe]}
+  data-etat={etat}
+  style={delai ? `--delai: ${delai}ms` : undefined}
+>
+  <span class="valeur">{valeur}</span>
+</span>
+
+<style>
+  /* 24×24 sur mobile, 32×32 à partir de md. Radius 2px : le monde
+     hospitalier est carré. */
+  .cellule {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 2px;
+    border: 1px solid var(--color-papier-200);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition:
+      background-color 350ms var(--ease-sortie),
+      border-color 350ms var(--ease-sortie);
+    transition-delay: var(--delai, 0ms);
+  }
+
+  .valeur {
+    transition: opacity 350ms var(--ease-sortie);
+    transition-delay: var(--delai, 0ms);
+  }
+
+  .cellule[data-etat='remplie'] {
+    background-color: var(--color-encre-700);
+    border-color: var(--color-encre-700);
+    color: var(--color-papier-50);
+  }
+
+  .cellule[data-etat='repos'] {
+    background-color: var(--color-papier-100);
+    color: var(--color-encre-500);
+  }
+
+  /* État « libérée » : soit imposé au rendu (mouvement réduit), soit
+     déclenché par la classe posée sur la grille au terme de la cascade. */
+  .cellule[data-etat='liberee'],
+  :global(.grille-planning.est-liberee) .cellule {
+    background-color: transparent;
+    border-color: var(--color-sauge-400);
+    border-style: dashed;
+    color: var(--color-sauge-400);
+  }
+
+  .cellule[data-etat='liberee'] .valeur,
+  :global(.grille-planning.est-liberee) .valeur {
+    opacity: 0;
+  }
+
+  @media (min-width: 768px) {
+    .cellule {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
+  }
+</style>

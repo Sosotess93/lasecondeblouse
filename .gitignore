@@ -1,0 +1,26 @@
+# Dépendances
+node_modules/
+
+# Sorties de build
+dist/
+.vercel/
+.astro/
+
+# Secrets. Seul .env.example est versionné.
+.env
+.env.*
+!.env.example
+
+# Préférences locales de l'agent. .claude/launch.json reste versionné :
+# il décrit comment lancer le serveur de développement du projet.
+.claude/settings.local.json
+
+# Système et outillage
+.DS_Store
+*.log
+npm-debug.log*
+yarn-error.log*
+.idea/
+.vscode/
+*~
+*.orig

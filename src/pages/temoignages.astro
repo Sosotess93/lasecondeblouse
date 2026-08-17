@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
+import Temoignages from '../components/sections/Temoignages.astro';
+import CtaFinal from '../components/sections/CtaFinal.astro';
+
+/* Pas d’AggregateRating ni de Review sur sa propre offre : ignorés ou
+   pénalisés par Google, et risque juridique sur l’authenticité des avis
+   pour un gain nul (cf. spec/08-seo-geo.md). */
+
+const regles = [
+  {
+    titre: 'Accord écrit, systématiquement',
+    corps:
+      'Chaque personne citée a donné son accord par écrit avant publication, et pour les vidéos, son accord au droit à l’image. Ces accords sont conservés.',
+  },
+  {
+    titre: 'Identifiable, jamais anonyme',
+    corps:
+      'Prénom, initiale du nom, ancienne fonction, service le cas échéant, et date de promotion. Un témoignage anonyme n’est pas vérifiable, donc pas publiable.',
+  },
+  {
+    titre: 'Aucun montant',
+    corps:
+      'Aucun chiffre de revenu n’apparaît, ni en texte, ni en capture d’écran. Le revenu d’un closeur est variable et peut être nul : en publier un donnerait une idée fausse de ce qui vous attend.',
+  },
+  {
+    titre: 'Leurs mots, pas les nôtres',
+    corps:
+      'Nous ne rédigeons pas les témoignages et nous ne les lissons pas. Les hésitations et les réserves restent. Une citation est corrigée uniquement pour l’orthographe.',
+  },
+  {
+    titre: 'Pas de capture recadrée',
+    corps:
+      'Ni capture WhatsApp, ni story Instagram rognée : invérifiables et, pour cette raison, suspectes. Une citation assumée ou une vidéo, rien d’autre.',
+  },
+  {
+    titre: 'Contreparties déclarées',
+    corps:
+      'Si un témoignage a été obtenu en échange d’une remise ou d’une commission d’affiliation, la mention figure sous le témoignage.',
+  },
+];
+---
+
+<Base
+  titre="Avis et parcours des participantes"
+  description="Les parcours des participantes au programme La Seconde Blouse, et la méthode selon laquelle ces témoignages sont collectés et vérifiés."
+  canonique="/temoignages"
+>
+  <Temoignages miseEnAvantSeule={false} titreH1 avecLienMethode={false}>
+    <p slot="chapeau" class="lead mesure mb-14 text-encre-700">
+      Les parcours ci-dessous sont individuels. Ils ne disent pas ce qui vous
+      arrivera, ils disent ce qui leur est arrivé. Notre méthode de collecte est
+      décrite en bas de page, pour que vous puissiez juger de ce qu’ils valent.
+    </p>
+  </Temoignages>
+
+  <Section id="methode" tone="accent" titre="Comment nous collectons ces témoignages">
+    <p class="mesure text-encre-700">
+      Le secteur de la formation au closing a suffisamment de faux avis pour
+      qu’il soit légitime de se méfier des nôtres. Voici donc nos règles, pour
+      que vous puissiez les vérifier.
+    </p>
+
+    <dl class="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
+      {
+        regles.map((regle) => (
+          <div class="border-t border-papier-200 pt-5">
+            <dt class="mb-2 font-semibold text-encre-900">{regle.titre}</dt>
+            <dd class="text-encre-700">{regle.corps}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </Section>
+
+  <CtaFinal />
+</Base>

@@ -1,0 +1,12 @@
+---
+interface Props {
+  class?: string;
+  as?: 'div' | 'header' | 'footer' | 'nav';
+}
+
+const { class: classe = '', as: Balise = 'div' } = Astro.props;
+---
+
+<Balise class:list={['mx-auto w-full max-w-page px-5 md:px-10', classe]}>
+  <slot />
+</Balise>

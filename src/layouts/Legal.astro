@@ -1,0 +1,169 @@
+---
+import Base from './Base.astro';
+import Container from '../components/layout/Container.astro';
+
+interface Props {
+  titre: string;
+  description: string;
+  canonique: string;
+  h1: string;
+  miseAJour?: string;
+  /** Sommaire ancré, utile sur les CGV. */
+  sommaire?: { id: string; libelle: string }[];
+}
+
+const {
+  titre,
+  description,
+  canonique,
+  h1,
+  miseAJour,
+  sommaire = [],
+} = Astro.props;
+---
+
+<Base titre={titre} description={description} canonique={canonique}>
+  <Container class="py-16 md:py-24">
+    {/* Registre juridique : titres en Atkinson, pas en Fraunces. */}
+    <div class="page-legale">
+      <h1>{h1}</h1>
+      {
+        miseAJour && (
+          <p class="date-maj">Dernière mise à jour&nbsp;: {miseAJour}</p>
+        )
+      }
+
+
+      {
+        sommaire.length > 0 && (
+          <nav aria-label="Sommaire" class="sommaire">
+            <p class="eyebrow">Sommaire</p>
+            <ol>
+              {sommaire.map((entree) => (
+                <li>
+                  <a href={`#${entree.id}`}>{entree.libelle}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      <slot />
+    </div>
+  </Container>
+</Base>
+
+<style>
+  .page-legale {
+    max-width: 68ch;
+  }
+
+  .page-legale :global(h1) {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .page-legale :global(h2) {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.35;
+    letter-spacing: 0;
+    margin-top: 2.75rem;
+    margin-bottom: 0.75rem;
+    scroll-margin-top: 6rem;
+  }
+
+  .page-legale :global(h3) {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-legale :global(p),
+  .page-legale :global(ul),
+  .page-legale :global(ol) {
+    margin-bottom: 1rem;
+    color: var(--color-encre-700);
+  }
+
+  .page-legale :global(ul),
+  .page-legale :global(ol) {
+    padding-left: 1.25rem;
+  }
+
+  .page-legale :global(ul) {
+    list-style: disc;
+  }
+
+  .page-legale :global(ol) {
+    list-style: decimal;
+  }
+
+  .page-legale :global(li) {
+    margin-bottom: 0.375rem;
+  }
+
+  .page-legale :global(blockquote) {
+    border-left: 2px solid var(--color-papier-200);
+    padding-left: 1.25rem;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .page-legale :global(a) {
+    color: var(--color-encre-900);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .page-legale :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .page-legale :global(th),
+  .page-legale :global(td) {
+    border: 1px solid var(--color-papier-200);
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .page-legale :global(th) {
+    background-color: var(--color-papier-100);
+    font-weight: 600;
+  }
+
+  .date-maj {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-encre-500);
+    margin-top: 0.75rem;
+  }
+
+
+  .sommaire {
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--color-papier-200);
+    border-bottom: 1px solid var(--color-papier-200);
+    padding: 1.25rem 0;
+  }
+
+  .sommaire .eyebrow {
+    color: var(--color-encre-500);
+    margin-bottom: 0.75rem;
+  }
+
+  .sommaire ol {
+    margin-bottom: 0;
+  }
+</style>

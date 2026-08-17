@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../../components/layout/Section.astro';
+import FormulaireGuide from '../../components/sections/FormulaireGuide.astro';
+import AConfirmer from '../../components/ui/AConfirmer.astro';
+import { Image } from 'astro:assets';
+
+/* Décorative : `alt=""` pour qu'un lecteur d'écran ne l'annonce pas. Le titre
+   et le contenu du guide sont déjà dans le texte à côté. */
+const couvertures = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/guide-couverture.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+const couverture = Object.values(couvertures)[0]?.default;
+
+const contenu = [
+  'Ce que fait réellement chaque métier, au quotidien.',
+  'Ce qu’il demande : compétences, matériel, temps d’apprentissage.',
+  'Comment on y est rémunéré, et selon quelles variables.',
+  'Ceux qui ne valent pas le détour, et pourquoi.',
+];
+---
+
+<Base
+  titre="7 métiers du digital sans reprendre d’études"
+  description="Un guide écrit par une ancienne infirmière : ce que font réellement sept métiers du digital accessibles sans reprendre d’études, et ce qu’ils demandent."
+  canonique="/guide"
+>
+  <Section spacing="serre">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-16">
+      <div>
+        <p class="eyebrow mb-4 text-or-600">Guide gratuit</p>
+        <h1 class="mesure-large">
+          Sept métiers du digital accessibles sans reprendre d’études
+        </h1>
+
+        <p class="lead mt-7 mesure text-encre-700">
+          Un guide de <AConfirmer quoi="nombre de pages" /> pages écrit par une
+          ancienne infirmière&nbsp;: ce que font réellement ces métiers, ce qu’ils
+          demandent, ce qu’ils valent, et ceux qui ne valent pas le détour. Le
+          closing en fait partie, mais ce n’est pas le seul.
+        </p>
+
+        <ul class="mt-9 space-y-3">
+          {
+            contenu.map((ligne) => (
+              <li class="flex gap-3 text-encre-700">
+                <span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-[1px] bg-or-500" aria-hidden="true" />
+                <span>{ligne}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="mt-9 mesure text-[0.9375rem] text-encre-500">
+          Vous recevrez ensuite quelques e-mails sur la reconversion des
+          soignants. Désinscription en un clic, à tout moment.
+        </p>
+      </div>
+
+      <div>
+        {
+          couverture && (
+            <Image
+              src={couverture}
+              alt=""
+              widths={[300, 460]}
+              sizes="(min-width: 1024px) 15rem, 12rem"
+              loading="eager"
+              class="mx-auto mb-8 w-48 rounded-[4px] lg:w-60"
+            />
+          )
+        }
+        <FormulaireGuide />
+      </div>
+    </div>
+  </Section>
+</Base>

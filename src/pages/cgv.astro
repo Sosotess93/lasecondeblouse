@@ -1,0 +1,245 @@
+---
+import Legal from '../layouts/Legal.astro';
+import AConfirmer from '../components/ui/AConfirmer.astro';
+import { contact, editrice, mediateur, tarif } from '../data/site';
+
+/**
+ * Trame de CGV, à compléter et à faire relire.
+ *
+ * Volontairement non générée à partir d’un modèle générique du commerce en
+ * ligne : les CGV engagent la responsabilité de l’éditrice et doivent décrire
+ * la prestation réellement fournie (cf. spec/07-composants.md §Pages légales).
+ * Les articles ci-dessous reprennent les obligations applicables à une
+ * prestation de formation vendue à distance à des consommateurs.
+ */
+
+const sommaire = [
+  { id: 'objet', libelle: 'Objet et champ d’application' },
+  { id: 'prestation', libelle: 'Description de la prestation' },
+  { id: 'commande', libelle: 'Souscription' },
+  { id: 'prix', libelle: 'Prix et modalités de paiement' },
+  { id: 'retractation', libelle: 'Droit de rétractation' },
+  { id: 'formulaire', libelle: 'Formulaire type de rétractation' },
+  { id: 'obligations', libelle: 'Obligations des parties' },
+  { id: 'garanties', libelle: 'Absence de garantie de résultat' },
+  { id: 'donnees', libelle: 'Données personnelles' },
+  { id: 'litiges', libelle: 'Médiation et litiges' },
+];
+
+const formateurEuros = new Intl.NumberFormat('fr-FR', {
+  style: 'currency',
+  currency: 'EUR',
+  maximumFractionDigits: 0,
+});
+---
+
+<Legal
+  titre="Conditions générales de vente · La Seconde Blouse"
+  description="Conditions générales de vente du programme La Seconde Blouse : prestation, prix, paiement, rétractation et litiges."
+  canonique="/cgv"
+  h1="Conditions générales de vente"
+  sommaire={sommaire}
+>
+  <h2 id="objet">1. Objet et champ d’application</h2>
+  <p>
+    Les présentes conditions régissent la vente du programme de formation
+    «&nbsp;La Seconde Blouse&nbsp;», édité par{' '}
+    {editrice.raisonSociale ?? <AConfirmer quoi="raison sociale" />} (ci-après
+    «&nbsp;l’éditrice&nbsp;»), à toute personne physique souscrivant à ce
+    programme (ci-après «&nbsp;le participant&nbsp;»).
+  </p>
+  <p>
+    La souscription au programme emporte acceptation pleine et entière des
+    présentes conditions, portées à la connaissance du participant avant tout
+    engagement. Lorsque le participant souscrit à titre professionnel et fournit
+    un numéro SIREN, le régime applicable diffère&nbsp;: cette qualité est
+    recueillie explicitement au moment de la souscription.
+  </p>
+
+  <h2 id="prestation">2. Description de la prestation</h2>
+  <p>
+    Le programme est une formation professionnelle au métier de closeur,
+    articulée en quatre phases&nbsp;: travail sur le cadre et le rapport à la
+    vente, apprentissage de la méthode d’entretien, entraînement pratique sur
+    simulations débriefées, puis accompagnement au démarrage de l’activité
+    indépendante et présentation aux structures du réseau de l’éditrice.
+  </p>
+  <p>
+    Durée, format, rythme des sessions et modalités d’accès aux supports&nbsp;:{' '}
+    <AConfirmer quoi="durée, format, accès" />
+  </p>
+  <p>
+    Le programme n’est ni certifiant, ni enregistré au RNCP. L’éditrice n’est
+    pas un organisme de formation certifié Qualiopi. Le programme n’est donc
+    éligible ni au compte personnel de formation (CPF), ni à un financement
+    France Travail.
+  </p>
+
+  <h2 id="commande">3. Souscription</h2>
+  <p>
+    La souscription intervient à l’issue d’un appel de découverte gratuit et
+    sans engagement, dont le déroulé est publié sur le site. Le contenu du
+    programme, sa durée et son prix sont communiqués avant toute souscription.
+  </p>
+  <p>
+    Aucune remise conditionnée à une décision immédiate, aucune offre limitée
+    dans le temps et aucune incitation à souscrire un crédit à la consommation
+    ne sont pratiquées. Le participant peut interrompre l’appel et souscrire
+    ultérieurement au même tarif.
+  </p>
+
+  <h2 id="prix">4. Prix et modalités de paiement</h2>
+  <p>
+    Le prix du programme est de{' '}
+    {
+      tarif.montant !== null ? (
+        <strong>{formateurEuros.format(tarif.montant)} toutes taxes comprises</strong>
+      ) : (
+        <AConfirmer quoi="tarif TTC" />
+      )
+    }.
+  </p>
+  <p>
+    Modalités de paiement échelonné&nbsp;:{' '}
+    {
+      tarif.nombreEcheances ? (
+        <>en {tarif.nombreEcheances} échéances, sans frais.</>
+      ) : (
+        <AConfirmer quoi="nombre d’échéances et frais éventuels" />
+      )
+    }{' '}
+    Au-delà de trois échéances, ou en présence de frais, l’opération est
+    susceptible de relever du crédit à la consommation&nbsp;: ce point doit être
+    validé juridiquement avant mise en ligne.
+  </p>
+
+  <h2 id="retractation">5. Droit de rétractation</h2>
+  <p>
+    La vente étant conclue à distance, le participant dispose d’un délai de
+    quatorze jours à compter de la conclusion du contrat pour exercer son droit
+    de rétractation, sans avoir à motiver sa décision ni à supporter de pénalité
+    (article L221-18 du code de la consommation).
+  </p>
+  <p>
+    Pour l’exercer, le participant adresse une déclaration dénuée d’ambiguïté à{' '}
+    {
+      contact.email ? (
+        <a href={`mailto:${contact.email}`}>{contact.email}</a>
+      ) : (
+        <AConfirmer quoi="adresse e-mail de contact" />
+      )
+    }, ou utilise le formulaire type reproduit ci-dessous. Le remboursement
+    intervient dans les quatorze jours suivant la réception de la demande, par
+    le même moyen de paiement que celui utilisé lors de la souscription.
+  </p>
+  <p>
+    Si le participant demande expressément l’accès immédiat aux contenus
+    numériques avant l’expiration du délai, il est informé qu’il perd son droit
+    de rétractation une fois l’exécution commencée. Cette renonciation est
+    recueillie de façon distincte et explicite au moment de la souscription, et
+    non par simple acceptation des présentes conditions.
+  </p>
+
+  <h2 id="formulaire">6. Formulaire type de rétractation</h2>
+  <p>
+    À compléter et à renvoyer uniquement si vous souhaitez vous rétracter du
+    contrat.
+  </p>
+  <blockquote>
+    <p>
+      À l’attention de{' '}
+      {editrice.raisonSociale ?? <AConfirmer quoi="raison sociale" />},{' '}
+      {editrice.adresse ?? <AConfirmer quoi="adresse postale" />},{' '}
+      {contact.email ?? <AConfirmer quoi="adresse e-mail" />}&nbsp;:
+    </p>
+    <p>
+      Je vous notifie par la présente ma rétractation du contrat portant sur la
+      prestation de service ci-dessous&nbsp;:
+    </p>
+    <ul>
+      <li>Commandé le : …</li>
+      <li>Nom du participant : …</li>
+      <li>Adresse du participant : …</li>
+      <li>Date : …</li>
+      <li>Signature (uniquement en cas de notification sur papier) : …</li>
+    </ul>
+  </blockquote>
+
+  <h2 id="obligations">7. Obligations des parties</h2>
+  <p>
+    L’éditrice s’engage à fournir les contenus et sessions annoncés, à répondre
+    aux questions du participant pendant la durée d’accès, et à le présenter aux
+    structures de son réseau à l’issue de la phase 4.
+  </p>
+  <p>
+    Le participant s’engage à un usage strictement personnel des supports. Leur
+    reproduction, leur partage ou leur revente sont interdits. L’accès peut être
+    suspendu sans remboursement en cas de manquement caractérisé.
+  </p>
+
+  <h2 id="garanties">8. Absence de garantie de résultat</h2>
+  <p>
+    Le closing est une activité indépendante rémunérée à la commission. Les
+    revenus dépendent du produit vendu, du volume d’appels confiés, du taux de
+    conversion et de la régularité de chacun&nbsp;: ils sont variables et peuvent
+    être nuls.
+  </p>
+  <p>
+    L’éditrice ne garantit ni mission, ni contrat, ni niveau de revenu, et ne
+    procède à aucun placement au sens des articles L5321-1 et suivants du code
+    du travail. La présentation aux structures partenaires ne constitue ni une
+    promesse d’embauche, ni une promesse de collaboration&nbsp;: la suite dépend
+    des échanges entre le participant et ces structures.
+  </p>
+  <p>
+    Le programme ne constitue pas un accompagnement médical ou psychologique.
+  </p>
+
+  <h2 id="donnees">9. Données personnelles</h2>
+  <p>
+    Les traitements de données réalisés dans le cadre de la souscription sont
+    décrits dans la{' '}
+    <a href="/confidentialite">politique de confidentialité</a>.
+  </p>
+
+  <h2 id="litiges">10. Médiation et litiges</h2>
+  <p>
+    En cas de différend, le participant s’adresse d’abord à l’éditrice. À défaut
+    de solution, il peut recourir gratuitement au médiateur de la consommation
+    dont relève l’éditrice&nbsp;:{' '}
+    {
+      mediateur.nom ? (
+        <>
+          {mediateur.nom}
+          {mediateur.url && (
+            <>
+              {' '}
+              (<a href={mediateur.url} rel="noopener noreferrer" target="_blank">
+                {mediateur.url}
+              </a>)
+            </>
+          )}
+          {mediateur.adresse && <>, {mediateur.adresse}</>}.
+        </>
+      ) : (
+        <AConfirmer quoi="médiateur de la consommation, adhésion obligatoire" />
+      )
+    }
+  </p>
+  <p>
+    La Commission européenne met également à disposition une plateforme de
+    règlement en ligne des litiges&nbsp;:{' '}
+    <a
+      href="https://ec.europa.eu/consumers/odr"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      ec.europa.eu/consumers/odr
+    </a>.
+  </p>
+  <p>
+    Les présentes conditions sont soumises au droit français. À défaut de
+    résolution amiable, le litige relève des juridictions compétentes dans les
+    conditions prévues par le code de procédure civile.
+  </p>
+</Legal>

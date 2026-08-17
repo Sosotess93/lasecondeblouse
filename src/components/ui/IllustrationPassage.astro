@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Illustration du passage : la même personne en tenue de soignante, puis chez
+ * elle en train de travailler.
+ *
+ * Réservée à la section « la fondatrice ». Le portrait seul y faisait doublon
+ * avec le hero, où il apparaît déjà : deux fois la même image sur une page
+ * se remarque et donne l'impression d'un site à court de visuels.
+ *
+ * Le contenu de l'illustration porte du sens, donc `alt` est renseigné et non
+ * vide : c'est le récit du changement de métier, pas une décoration.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: classe = '' } = Astro.props;
+
+const trouvees = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/oumaya-passage.{jpg,jpeg,png,webp}',
+  { eager: true }
+);
+
+const passage = Object.values(trouvees)[0]?.default;
+---
+
+{
+  passage && (
+    <Image
+      src={passage}
+      alt="Illustration : la même personne, d’abord en tenue de soignante dans un couloir de service, puis chez elle à sa table, un casque téléphonique sur les oreilles et un carnet ouvert devant elle."
+      widths={[640, 900, 1180]}
+      sizes="(min-width: 1180px) 1180px, 100vw"
+      loading="lazy"
+      class:list={['w-full rounded-[12px]', classe]}
+    />
+  )
+}

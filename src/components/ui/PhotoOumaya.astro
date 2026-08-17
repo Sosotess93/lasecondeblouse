@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Photo d’Oumaya (cf. spec/05 §Photographie).
+ *
+ * Détectée au build : dès que `src/assets/oumaya-portrait.*` existe, elle est
+ * utilisée, sans autre modification du code. Tant qu’elle est absente, on
+ * affiche un cadre explicite plutôt qu’une banque d’images : une photo de
+ * stock sur une page qui vend l’authenticité d’un parcours est exactement le
+ * signal que cette audience repère.
+ *
+ * Oumaya ne souhaitant pas exposer son visage, l’image sera une illustration
+ * sans traits, dans le registre du logo, et non une photographie.
+ */
+
+interface Props {
+  prioritaire?: boolean;
+  class?: string;
+  ratio?: 'portrait' | 'carre';
+}
+
+const { prioritaire = false, class: classe = '', ratio = 'portrait' } = Astro.props;
+
+const ratios = {
+  portrait: 'aspect-[4/5]',
+  carre: 'aspect-square',
+};
+
+const trouvees = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/oumaya-portrait.{jpg,jpeg,png,webp,avif}',
+  { eager: true }
+);
+
+const portrait = Object.values(trouvees)[0]?.default;
+---
+
+{
+  portrait ? (
+    <Image
+      src={portrait}
+      alt="Portrait illustré d’Oumaya, fondatrice de La Seconde Blouse"
+      widths={[400, 640, 900]}
+      sizes="(min-width: 768px) 24rem, 20rem"
+      loading={prioritaire ? 'eager' : 'lazy'}
+      fetchpriority={prioritaire ? 'high' : 'auto'}
+      class:list={[
+        ratios[ratio],
+        'w-full rounded-[12px] object-cover',
+        classe,
+      ]}
+    />
+  ) : (
+    <div
+      class:list={[
+        ratios[ratio],
+        'flex flex-col items-center justify-center gap-3 rounded-[12px] border border-dashed border-papier-200 bg-papier-100 p-6 text-center',
+        classe,
+      ]}
+      role="img"
+      aria-label="Emplacement réservé au portrait illustré d’Oumaya"
+      data-prioritaire={prioritaire ? '' : undefined}
+    >
+      <span class="eyebrow text-encre-500">Portrait</span>
+      <p class="max-w-[24ch] text-[0.875rem] leading-relaxed text-encre-500">
+        Portrait illustré d’Oumaya à intégrer, dans le style du logo. Aucune
+        image de banque ne sera utilisée à la place.
+      </p>
+      <span class="font-mono text-[0.6875rem] tracking-[0.08em] text-or-600">
+        [À CONFIRMER]
+      </span>
+    </div>
+  )
+}

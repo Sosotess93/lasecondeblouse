@@ -1,0 +1,193 @@
+---
+import '../styles/global.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import BandeauCookies from '../components/layout/BandeauCookies.astro';
+import { site, contact, editrice, reseaux } from '../data/site';
+
+interface Props {
+  titre: string;
+  description: string;
+  /** Chemin canonique. Par défaut, celui de la page courante. */
+  canonique?: string;
+  imageOg?: string;
+  noindex?: boolean;
+  /** Objets JSON-LD supplémentaires (WebSite, Person, FAQPage…). */
+  schema?: Record<string, unknown>[];
+}
+
+const {
+  titre,
+  description,
+  canonique = Astro.url.pathname,
+  imageOg = '/og-default.png',
+  noindex = false,
+  schema = [],
+} = Astro.props;
+
+const urlCanonique = new URL(canonique, site.url).href;
+const urlImageOg = new URL(imageOg, site.url).href;
+
+const sameAs = [reseaux.instagram, reseaux.tiktok].filter(Boolean);
+
+const organisation = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${site.url}/#organisation`,
+  name: site.nom,
+  url: site.url,
+  logo: new URL('/logo.png', site.url).href,
+  description: site.description,
+  founder: { '@type': 'Person', name: 'Oumaya' },
+  email: contact.email,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    email: contact.email,
+    telephone: contact.telephone,
+    availableLanguage: 'French',
+  },
+  ...(sameAs.length > 0 ? { sameAs } : {}),
+  ...(editrice.siren ? { identifier: editrice.siren } : {}),
+};
+
+const donneesStructurees = [organisation, ...schema];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titre}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={urlCanonique} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#2A2219" />
+
+    {/* Seules les variantes réellement utilisées au-dessus de la ligne de flottaison. */}
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/fraunces-latin-standard-normal.woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.nom} />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content={titre} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={urlCanonique} />
+    <meta property="og:image" content={urlImageOg} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titre} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={urlImageOg} />
+
+    {
+      donneesStructurees.map((objet) => (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={JSON.stringify(objet)}
+        />
+      ))
+    }
+  </head>
+
+  <body class="min-h-screen">
+    <a
+      href="#contenu"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:rounded-[4px] focus:bg-encre-900 focus:px-4 focus:py-2.5 focus:text-papier-50"
+    >
+      Aller au contenu
+    </a>
+
+    <Header />
+
+    <main id="contenu">
+      <slot />
+    </main>
+
+    <Footer />
+    <BandeauCookies />
+
+    <script>
+      // Révélation au scroll : titres de section uniquement, une seule fois.
+      const aReveler = document.querySelectorAll('.reveal');
+      const mouvementReduit = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+
+      if (mouvementReduit || !('IntersectionObserver' in window)) {
+        aReveler.forEach((element) => element.classList.add('est-visible'));
+      } else {
+        const observateur = new IntersectionObserver(
+          (entrees) => {
+            entrees.forEach((entree) => {
+              // Un titre déjà dépassé (arrivée sur une ancre, retour arrière)
+              // ne déclenchera jamais d’intersection : on le révèle aussitôt.
+              const dejaPasse = entree.boundingClientRect.top < 0;
+              if (!entree.isIntersecting && !dejaPasse) return;
+              entree.target.classList.add('est-visible');
+              observateur.unobserve(entree.target);
+            });
+          },
+          { threshold: 0.2, rootMargin: '0px 0px -5% 0px' }
+        );
+        aReveler.forEach((element) => observateur.observe(element));
+      }
+
+      // Analytics : un seul écouteur global sur [data-evt].
+      document.addEventListener('click', (evenement) => {
+        const cible = evenement.target as HTMLElement | null;
+        const element = cible?.closest<HTMLElement>('[data-evt]');
+        if (!element?.dataset.evt) return;
+        window.lsbTrack?.(element.dataset.evt, { page: location.pathname });
+      });
+
+      // Jalons de lecture. `scroll_transparence` mesure combien de
+      //   visiteurs atteignent le prix ; c’est le signal le plus utile du site.
+      const jalons = document.querySelectorAll<HTMLElement>('[data-jalon]');
+      if (jalons.length > 0 && 'IntersectionObserver' in window) {
+        const observateurJalons = new IntersectionObserver(
+          (entrees) => {
+            entrees.forEach((entree) => {
+              if (!entree.isIntersecting) return;
+              const nom = (entree.target as HTMLElement).dataset.jalon;
+              if (nom) window.lsbTrack?.(nom, { page: location.pathname });
+              observateurJalons.unobserve(entree.target);
+            });
+          },
+          { threshold: 0.3 }
+        );
+        jalons.forEach((element) => observateurJalons.observe(element));
+      }
+
+      // FAQ : ouverture d’une question, avec son libellé.
+      document.querySelectorAll<HTMLDetailsElement>('[data-faq]').forEach((bloc) => {
+        bloc.addEventListener('toggle', () => {
+          if (!bloc.open) return;
+          window.lsbTrack?.('faq_ouverte', {
+            question: bloc.dataset.faq,
+            page: location.pathname,
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

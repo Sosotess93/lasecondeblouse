@@ -1,0 +1,79 @@
+---
+interface Props {
+  question: string;
+  /** Ouvert par défaut, à réserver à la première question d’une page. */
+  ouvert?: boolean;
+}
+
+const { question, ouvert = false } = Astro.props;
+---
+
+<details class="accordeon" open={ouvert} data-faq={question}>
+  <summary>
+    <span>{question}</span>
+    <svg
+      class="chevron"
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3.5 6 8 10.5 12.5 6"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="square"></path>
+    </svg>
+  </summary>
+  <div class="corps">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .accordeon {
+    border-top: 1px solid var(--color-papier-200);
+  }
+
+  .accordeon:last-of-type {
+    border-bottom: 1px solid var(--color-papier-200);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 44px;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1.45;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:hover {
+    color: var(--color-encre-700);
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    color: var(--color-encre-500);
+    transition: transform 150ms var(--ease-sortie);
+  }
+
+  .accordeon[open] .chevron {
+    transform: rotate(180deg);
+  }
+
+  .corps {
+    padding-bottom: 1.5rem;
+    max-width: 62ch;
+    color: var(--color-encre-700);
+  }
+</style>

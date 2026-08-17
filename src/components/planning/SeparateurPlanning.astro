@@ -1,0 +1,37 @@
+---
+import Container from '../layout/Container.astro';
+
+/**
+ * Usage 3 du motif signature (spec/05 §Signature) : une ligne de cellules
+ * vides, très discrète, pour marquer la limite entre deux sections de même
+ * fond. Sans elle, le rythme vertical se lit comme du vide plutôt que comme
+ * une séparation.
+ */
+---
+
+<div class="bg-papier-50" aria-hidden="true">
+  <Container>
+    <div class="separateur"></div>
+  </Container>
+</div>
+
+<style>
+  .separateur {
+    height: 8px;
+    opacity: 0.5;
+    background-image: linear-gradient(
+      to right,
+      var(--color-papier-200) 1px,
+      transparent 1px
+    );
+    background-size: 38px 100%;
+    border-top: 1px solid var(--color-papier-200);
+    border-bottom: 1px solid var(--color-papier-200);
+  }
+
+  @media (max-width: 767px) {
+    .separateur {
+      background-size: 28px 100%;
+    }
+  }
+</style>

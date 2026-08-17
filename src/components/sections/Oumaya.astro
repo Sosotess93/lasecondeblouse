@@ -1,0 +1,70 @@
+---
+import Section from '../layout/Section.astro';
+import Button from '../ui/Button.astro';
+import IllustrationPassage from '../ui/IllustrationPassage.astro';
+import AConfirmer from '../ui/AConfirmer.astro';
+
+interface Props {
+  eyebrow?: string;
+  titre?: string;
+  titreH1?: boolean;
+  avecLien?: boolean;
+}
+
+const {
+  eyebrow = 'La fondatrice',
+  titre = "J’ai posé ma blouse un lundi matin.",
+  titreH1 = false,
+  avecLien = true,
+} = Astro.props;
+---
+
+<Section id="oumaya" eyebrow={eyebrow} titre={titre} titreH1={titreH1}>
+  <slot name="chapeau" />
+
+  {/* L'illustration du passage plutôt que le portrait : celui-ci est déjà
+      dans le hero, et le voir deux fois sur la même page se remarque. Elle
+      raconte en plus exactement ce que dit cette section. */}
+  <IllustrationPassage class="mb-12 md:mb-14" />
+
+  <div>
+    {/* [À CONFIRMER] : trame à réécrire avec ses mots (cf. spec/04-copy.md §5). */}
+    <div class="mesure space-y-5 text-encre-700">
+      <p>
+        Infirmière pendant <AConfirmer quoi="X" /> ans en <AConfirmer
+          quoi="service"
+        />. J’aimais mon métier. Je ne supportais plus les conditions dans
+        lesquelles je l’exerçais.
+      </p>
+      <p>
+        J’ai découvert le closing par hasard, en cherchant autre chose. Ce qui
+        m’a convaincue, ce n’est pas la promesse de revenus : j’ai fui les
+        comptes qui ne parlaient que de ça. C’est de constater que la première
+        heure de formation portait sur l’écoute active, et que je la connaissais
+        déjà.
+      </p>
+      <p>
+        J’ai été formée, j’ai passé mes premiers appels, j’ai été mauvaise, puis
+        moins mauvaise. J’ai démissionné <AConfirmer quoi="X" /> mois plus tard.
+      </p>
+      <p>
+        J’ai créé La Seconde Blouse parce que les collègues qui me demandaient
+        comment j’avais fait tombaient toutes sur les mêmes programmes&nbsp;: des
+        gens qui n’ont jamais mis les pieds dans un service, qui vendent du rêve
+        et disparaissent après le paiement. Je voulais un programme fait par une
+        soignante, pour des soignants, qui dit la vérité sur ce métier, y
+        compris ce qui est difficile.
+      </p>
+
+      {
+        avecLien && (
+          <div class="pt-3">
+            <Button href="/oumaya" variante="secondaire">
+              Lire le parcours complet
+            </Button>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Section>

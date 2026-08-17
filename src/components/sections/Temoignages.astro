@@ -1,0 +1,90 @@
+---
+import { getCollection } from 'astro:content';
+import Section from '../layout/Section.astro';
+import Disclaimer from '../layout/Disclaimer.astro';
+
+interface Props {
+  /** Sur la landing : les trois mis en avant. Sur /temoignages : tous. */
+  limite?: number;
+  miseEnAvantSeule?: boolean;
+  titre?: string;
+  titreH1?: boolean;
+  avecLienMethode?: boolean;
+}
+
+const {
+  limite,
+  miseEnAvantSeule = true,
+  titre = 'Elles l’ont fait avant vous.',
+  titreH1 = false,
+  avecLienMethode = true,
+} = Astro.props;
+
+const tous = await getCollection('temoignages');
+const filtres = miseEnAvantSeule
+  ? tous.filter((entree) => entree.data.miseEnAvant)
+  : tous;
+const temoignages = limite ? filtres.slice(0, limite) : filtres;
+---
+
+<Section id="temoignages" titre={titre} titreH1={titreH1}>
+  <slot name="chapeau" />
+
+  {
+    temoignages.length > 0 ? (
+      <ul class="grid gap-8 md:grid-cols-3">
+        {temoignages.map((entree) => (
+          <li class="flex flex-col border-t border-papier-200 pt-6">
+            <blockquote class="flex-1 text-encre-900">
+              <p>«&nbsp;{entree.data.citation}&nbsp;»</p>
+            </blockquote>
+            <p class="mt-5 text-[0.875rem] leading-relaxed text-encre-500">
+              <strong class="font-semibold text-encre-900">
+                {entree.data.prenom} {entree.data.initiale}.
+              </strong>
+              <br />
+              ancienne {entree.data.ancienneFonction}
+              {entree.data.service && `, ${entree.data.service}`} · promotion{' '}
+              {entree.data.promotion}
+            </p>
+            {entree.data.contrepartie && (
+              <p class="mt-2 text-[0.8125rem] text-encre-500">
+                Témoignage obtenu en contrepartie de&nbsp;:{' '}
+                {entree.data.contrepartie}.
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      /* Collection vide : bloc neutre. Jamais de contenu de remplacement ,
+         un faux témoignage passé en production est une pratique trompeuse
+         caractérisée (cf. spec/02-conformite.md §4). */
+      <div class="mesure-large rounded-[4px] border border-dashed border-papier-200 bg-papier-100 p-7">
+        <p class="eyebrow mb-3 text-or-600">Témoignages à collecter</p>
+        <p class="text-encre-700">
+          Les premiers témoignages seront publiés ici, avec le prénom, l’ancienne
+          fonction et la date de promotion de chaque personne, et uniquement
+          après recueil de son accord écrit. Aucun témoignage n’est rédigé ni
+          reformulé par nos soins.
+        </p>
+      </div>
+    )
+  }
+
+  <Disclaimer class="mt-10">
+    {
+      avecLienMethode && (
+        <>
+          {' '}
+          <a
+            href="/temoignages#methode"
+            class="whitespace-nowrap underline underline-offset-2"
+          >
+            Comment nous collectons ces témoignages →
+          </a>
+        </>
+      )
+    }
+  </Disclaimer>
+</Section>

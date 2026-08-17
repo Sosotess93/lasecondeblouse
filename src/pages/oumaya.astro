@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/layout/Section.astro';
+import Oumaya from '../components/sections/Oumaya.astro';
+import CtaFinal from '../components/sections/CtaFinal.astro';
+import AConfirmer from '../components/ui/AConfirmer.astro';
+import { site } from '../data/site';
+
+/* Person renforce l’E-E-A-T, qui compte doublement sur un sujet à risque. */
+const personne = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Oumaya',
+  jobTitle: 'Closeuse et fondatrice de La Seconde Blouse',
+  description:
+    'Ancienne infirmière diplômée d’État reconvertie au closing, fondatrice du programme de reconversion La Seconde Blouse.',
+  worksFor: { '@id': `${site.url}/#organisation` },
+  knowsAbout: [
+    'reconversion professionnelle des soignants',
+    'closing éthique',
+    'entretien de vente par téléphone',
+    'métier infirmier',
+  ],
+  url: `${site.url}/oumaya`,
+};
+---
+
+<Base
+  titre="Oumaya, d’infirmière à closeuse · son parcours"
+  description="Le parcours d’Oumaya, ancienne infirmière devenue closeuse, et les raisons pour lesquelles elle a créé La Seconde Blouse."
+  canonique="/oumaya"
+  imageOg="/og-oumaya.jpg"
+  schema={[personne]}
+>
+  <Oumaya titreH1 avecLien={false}>
+    {/* Pas de logo ici : l'en-tête le porte désormais, à quelques dizaines de
+        pixels au-dessus. Trois occurrences sur une même page le banalisent. */}
+    <p slot="chapeau" class="lead mesure mb-14 text-encre-700">
+      Ma légitimité ne vient pas d’un diplôme de vente. Elle vient d’avoir fait
+      le métier que vous faites, et d’en être partie.
+    </p>
+  </Oumaya>
+
+  <Section tone="accent" titre="Pourquoi La Seconde Blouse">
+    <div class="mesure space-y-5 text-encre-700">
+      <p>
+        <AConfirmer quoi="récit long à recueillir auprès d’Oumaya" />. Cette
+        page attend son parcours détaillé&nbsp;: le service, l’année de départ,
+        ce qui a déclenché la décision, ses premiers appels, ses erreurs. Écrit
+        avec ses mots, sans lissage, et sans aucun chiffre de revenu.
+      </p>
+      <p>
+        Tant que ce texte n’est pas recueilli, aucun récit n’est publié à sa
+        place. Une page de fondatrice inventée est exactement ce que cette
+        audience sait détecter.
+      </p>
+    </div>
+  </Section>
+
+  <CtaFinal />
+</Base>

@@ -1,0 +1,194 @@
+---
+import PlanningCell from './PlanningCell.astro';
+import { JOURS, etatDe, semaines } from './roulement';
+
+interface Props {
+  /** Nombre de semaines rendues. 4 = un mois. */
+  semainesAffichees?: number;
+  /** Semaines visibles sous 768px, le reste est masqué en CSS. */
+  semainesMobile?: number;
+  anime?: boolean;
+  legendeAvant?: string;
+  legendeApres?: string;
+  class?: string;
+}
+
+const {
+  semainesAffichees = 4,
+  semainesMobile = 2,
+  anime = false,
+  legendeAvant,
+  legendeApres,
+  class: classe = '',
+} = Astro.props;
+
+/**
+ * Un roulement de service se lit comme une bande : les jours du mois en
+ * colonnes, de gauche à droite. C’est cette lecture qui est reprise sur
+ * desktop (28 colonnes). Sous 768px la bande se replie en semaines
+ * empilées de 7 colonnes, comme sur un planning mural.
+ */
+const lignes = semaines(semainesAffichees);
+const jours = lignes.flat();
+const enTetes = lignes.flatMap(() => JOURS);
+
+const PAS = 40; // ms : cascade de gauche à droite
+/* Délai après l'entrée de la grille dans le viewport, et non après le
+   chargement : la grille se trouve sous la ligne de flottaison, y compris
+   sur desktop. Déclenchée au chargement, la séquence serait terminée avant
+   que qui que ce soit ne la voie. */
+const DEPART = 600;
+const dureeCascade = (jours.length - 1) * PAS + 350;
+
+const cellulesMobile = semainesMobile * JOURS.length;
+---
+
+<figure class:list={['not-prose', classe]}>
+  <div
+    class:list={['grille-planning', { anime }]}
+    data-grille-planning
+    data-depart={anime ? DEPART : undefined}
+    data-duree={anime ? dureeCascade : undefined}
+    style={`--colonnes: ${jours.length}`}
+    aria-hidden="true"
+  >
+    <div class="bande entete">
+      {enTetes.map((jour) => <span class="jour">{jour}</span>)}
+    </div>
+
+    <div class="bande cellules">
+      {
+        jours.map((poste, index) => (
+          <PlanningCell
+            valeur={poste}
+            etat={etatDe(poste)}
+            delai={anime ? index * PAS : 0}
+            class={index >= cellulesMobile ? 'hors-mobile' : ''}
+          />
+        ))
+      }
+    </div>
+  </div>
+
+  {
+    (legendeAvant || legendeApres) && (
+      <figcaption
+        class="mt-4 font-mono text-[0.75rem] leading-relaxed tracking-[0.04em] text-encre-500"
+        data-legende-planning
+        data-apres={legendeApres}
+      >
+        {legendeAvant ?? legendeApres}
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .grille-planning {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: fit-content;
+  }
+
+  .bande {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    gap: 4px;
+  }
+
+  .jour {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--color-encre-500);
+  }
+
+  /* Mobile : deux semaines empilées, en-tête sur une seule ligne. */
+  .entete > :nth-child(n + 8),
+  .cellules > :global(.hors-mobile) {
+    display: none;
+  }
+
+  /* Desktop : la bande se déplie, un mois entier de gauche à droite. */
+  @media (min-width: 768px) {
+    .bande {
+      grid-template-columns: repeat(var(--colonnes), auto);
+      gap: 3px;
+    }
+
+    .grille-planning {
+      gap: 5px;
+    }
+
+    .jour {
+      width: 32px;
+      font-size: 10px;
+    }
+
+    .entete > :nth-child(n + 8),
+    .cellules > :global(.hors-mobile) {
+      display: inline-flex;
+    }
+
+    /* Respiration entre les semaines, sans trait : un planning de service
+       sépare les semaines par un blanc, pas par une bordure. */
+    .bande > :nth-child(7n + 1):not(:first-child) {
+      margin-left: 9px;
+    }
+  }
+</style>
+
+<script>
+  const grilles = document.querySelectorAll<HTMLElement>(
+    '[data-grille-planning].anime'
+  );
+  const mouvementReduit = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  grilles.forEach((grille) => {
+    const figure = grille.closest('figure');
+    const legende = figure?.querySelector<HTMLElement>('[data-legende-planning]');
+    const texteApres = legende?.dataset.apres;
+
+    const basculerLegende = () => {
+      if (legende && texteApres) legende.textContent = texteApres;
+    };
+
+    if (mouvementReduit || !('IntersectionObserver' in window)) {
+      // État final immédiat : grille vidée, légende d’après.
+      grille.classList.add('est-liberee');
+      basculerLegende();
+      return;
+    }
+
+    const depart = Number(grille.dataset.depart ?? 600);
+    const duree = Number(grille.dataset.duree ?? 1400);
+
+    const liberer = () => {
+      window.setTimeout(() => {
+        grille.classList.add('est-liberee');
+        window.setTimeout(basculerLegende, duree);
+      }, depart);
+    };
+
+    const observateur = new IntersectionObserver(
+      (entrees) => {
+        entrees.forEach((entree) => {
+          if (!entree.isIntersecting && entree.boundingClientRect.top >= 0) return;
+          observateur.unobserve(entree.target);
+          liberer();
+        });
+      },
+      // La bande doit être largement visible avant de commencer à se vider.
+      { threshold: 0.6 }
+    );
+
+    observateur.observe(grille);
+  });
+</script>

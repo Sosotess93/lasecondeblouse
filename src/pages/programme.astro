@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import Programme from '../components/sections/Programme.astro';
+import SeparateurPlanning from '../components/planning/SeparateurPlanning.astro';
+import Transparence from '../components/sections/Transparence.astro';
+import Metier from '../components/sections/Metier.astro';
+import Appel from '../components/sections/Appel.astro';
+import Faq from '../components/sections/Faq.astro';
+import CtaFinal from '../components/sections/CtaFinal.astro';
+import { entreesFaq, schemaFaq } from '../lib/faq';
+
+const entrees = await entreesFaq('programme');
+
+/* Pas de JSON-LD `Course` : ses champs (durée, modalité, provider) ne peuvent
+   pas encore être remplis honnêtement. Un balisage approximatif nuit plus
+   qu’il ne sert (cf. spec/08-seo-geo.md). */
+---
+
+<Base
+  titre="Le programme · contenu, durée et tarif"
+  description="Le détail du programme de La Seconde Blouse : les quatre phases, le format, le tarif, et ce que ce programme n’est pas. Sans promesse de revenu."
+  canonique="/programme"
+  schema={[schemaFaq(entrees)]}
+>
+  <Programme eyebrow="Le programme" titreH1>
+    <p slot="chapeau" class="lead mesure mb-14 text-encre-700">
+      Le programme forme des professionnels de santé au closing éthique. Il part
+      de zéro sur la technique de vente, et s’appuie sur ce que vous savez déjà
+      faire&nbsp;: écouter, reformuler, poser un cadre. Voici son contenu, son
+      format et son tarif. Tout est sur cette page, rien n’est réservé à
+      l’appel.
+    </p>
+  </Programme>
+
+  <SeparateurPlanning />
+  <Metier />
+  <Transparence />
+  <Appel />
+  <Faq page="programme" />
+  <SeparateurPlanning />
+  <CtaFinal />
+</Base>

@@ -1,0 +1,42 @@
+---
+interface Props {
+  href: string;
+  variante?: 'primaire' | 'secondaire';
+  taille?: 'normal' | 'compact';
+  /** Nom d’événement analytics, capté par le listener global sur [data-evt]. */
+  evenement?: string;
+  class?: string;
+  /** Pour les liens sortants uniquement. */
+  externe?: boolean;
+}
+
+const {
+  href,
+  variante = 'primaire',
+  taille = 'normal',
+  evenement,
+  class: classe = '',
+  externe = false,
+} = Astro.props;
+
+/* Styles définis dans src/styles/global.css, jamais en dur ici. */
+const variantes = {
+  primaire: 'bouton-primaire',
+  secondaire: 'bouton-secondaire',
+};
+
+const tailles = {
+  normal: '',
+  compact: 'bouton-compact',
+};
+---
+
+<a
+  href={href}
+  data-evt={evenement}
+  rel={externe ? 'noopener noreferrer' : undefined}
+  target={externe ? '_blank' : undefined}
+  class:list={['bouton', variantes[variante], tailles[taille], classe]}
+>
+  <slot />
+</a>

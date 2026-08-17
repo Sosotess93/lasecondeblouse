@@ -1,0 +1,140 @@
+---
+import Container from './Container.astro';
+import Disclaimer from './Disclaimer.astro';
+import Logo from './Logo.astro';
+import LogoComplet from '../ui/LogoComplet.astro';
+import { contact, reseaux, site } from '../../data/site';
+
+const annee = new Date().getFullYear();
+
+const liensNavigation = [
+  { libelle: 'Le programme', href: '/programme' },
+  { libelle: 'Oumaya', href: '/oumaya' },
+  { libelle: 'Témoignages', href: '/temoignages' },
+  { libelle: 'Réserver un appel', href: '/rdv' },
+  { libelle: 'Le guide', href: '/guide' },
+];
+
+const liensInformations = [
+  { libelle: 'Mentions légales', href: '/mentions-legales' },
+  { libelle: 'CGV', href: '/cgv' },
+  { libelle: 'Confidentialité', href: '/confidentialite' },
+  { libelle: 'Cookies', href: '/cookies' },
+];
+
+const liensSociaux = [
+  { libelle: 'Instagram', href: reseaux.instagram },
+  { libelle: 'TikTok', href: reseaux.tiktok },
+].filter((lien): lien is { libelle: string; href: string } => Boolean(lien.href));
+---
+
+<footer class="sur-sombre bg-encre-900 text-papier-50">
+  <Container class="py-16 md:py-20">
+    <div class="grid gap-10 md:grid-cols-4 md:gap-8">
+      <div class="md:col-span-1">
+        {/* C'est ici que le logo complet rend le mieux : le coup de pinceau
+            crème ressort sur l'encre, alors qu'il s'efface sur le fond papier.
+            Repli sur la marque géométrique tant que le fichier est absent. */}
+        <LogoComplet largeur={300} class="max-w-[15rem]">
+          <Logo class="text-papier-50" />
+        </LogoComplet>
+        <p class="mt-4 max-w-[34ch] text-[0.9375rem] leading-relaxed text-encre-200">
+          Programme de reconversion professionnelle pour les soignants, fondé par
+          Oumaya, ancienne infirmière.
+        </p>
+      </div>
+
+      <nav aria-labelledby="pied-navigation">
+        <h2 id="pied-navigation" class="eyebrow mb-4 font-body text-or-100">
+          Navigation
+        </h2>
+        <ul class="space-y-2.5">
+          {
+            liensNavigation.map((lien) => (
+              <li>
+                <a
+                  href={lien.href}
+                  class="text-[0.9375rem] text-papier-50 no-underline underline-offset-4 hover:underline"
+                >
+                  {lien.libelle}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="pied-informations">
+        <h2 id="pied-informations" class="eyebrow mb-4 font-body text-or-100">
+          Informations
+        </h2>
+        <ul class="space-y-2.5">
+          {
+            liensInformations.map((lien) => (
+              <li>
+                <a
+                  href={lien.href}
+                  class="text-[0.9375rem] text-papier-50 no-underline underline-offset-4 hover:underline"
+                >
+                  {lien.libelle}
+                </a>
+              </li>
+            ))
+          }
+          <li>
+            <a
+              href={`mailto:${contact.email}`}
+              class="text-[0.9375rem] text-papier-50 no-underline underline-offset-4 hover:underline"
+            >
+              {contact.email}
+            </a>
+          </li>
+          <li>
+            <a
+              href={contact.telephoneLien}
+              class="text-[0.9375rem] whitespace-nowrap text-papier-50 no-underline underline-offset-4 hover:underline"
+            >
+              {contact.telephone}
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="eyebrow mb-4 font-body text-or-100">Suivre</h2>
+        {
+          liensSociaux.length > 0 ? (
+            <ul class="space-y-2.5">
+              {liensSociaux.map((lien) => (
+                <li>
+                  <a
+                    href={lien.href}
+                    rel="noopener noreferrer me"
+                    target="_blank"
+                    class="text-[0.9375rem] text-papier-50 no-underline underline-offset-4 hover:underline"
+                  >
+                    {lien.libelle}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-[0.9375rem] text-encre-200">
+              Comptes à lier&nbsp;: [À CONFIRMER]
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="mt-14">
+      <Disclaimer variante="footer" />
+      {/* Mention de copyright, pas d'identification légale : la raison
+          sociale et le SIREN sont exigés dans les mentions légales, liées
+          juste au-dessus, et c'est là qu'ils sont attendus. */}
+      <p class="pt-6 text-[0.8125rem] text-encre-200">
+        © {annee} {site.nom}
+      </p>
+    </div>
+  </Container>
+</footer>

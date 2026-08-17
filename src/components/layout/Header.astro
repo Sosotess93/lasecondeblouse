@@ -1,0 +1,78 @@
+---
+import Container from './Container.astro';
+import Button from '../ui/Button.astro';
+import Logo from './Logo.astro';
+import LogoComplet from '../ui/LogoComplet.astro';
+import { navigation } from '../../data/site';
+---
+
+{/* Sentinelle : évite un écouteur `scroll`. Le header prend son ombre
+    lorsqu’elle sort du viewport, soit ~400px de défilement. */}
+<div data-sentinelle-header aria-hidden="true" class="absolute top-0 h-[400px] w-px">
+</div>
+
+{/* Barre sombre, comme le pied de page. C’est aussi ce qui rend le logo
+    complet utilisable ici : sur crème, le coup de pinceau et la blouse
+    blanche s’effacent ; sur encre, ils ressortent. */}
+<header
+  data-header
+  class="sur-sombre sticky top-0 z-50 bg-encre-900 text-papier-50 transition-[box-shadow] duration-200"
+>
+  <Container class="flex items-center justify-between gap-4 py-3 transition-[padding] duration-200 data-[compact]:py-1.5">
+    <a
+      href="/"
+      class="shrink-0 text-papier-50 no-underline"
+      aria-label="La Seconde Blouse, accueil"
+    >
+      <LogoComplet hauteur={56} prioritaire>
+        <Logo marqueSeuleSurMobile class="text-papier-50" />
+      </LogoComplet>
+    </a>
+
+    <div class="flex items-center gap-6">
+      <nav aria-label="Navigation principale" class="hidden md:block">
+        <ul class="flex items-center gap-6">
+          {
+            navigation.map((lien) => (
+              <li>
+                <a
+                  href={lien.href}
+                  class="text-[0.9375rem] text-papier-50 no-underline underline-offset-4 hover:underline"
+                >
+                  {lien.libelle}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <Button
+        href="/rdv"
+        taille="compact"
+        evenement="cta_header"
+        class="whitespace-nowrap"
+      >
+        Réserver un appel
+      </Button>
+    </div>
+  </Container>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const sentinelle = document.querySelector('[data-sentinelle-header]');
+  const conteneur = header?.firstElementChild as HTMLElement | null;
+
+  if (header && sentinelle && 'IntersectionObserver' in window) {
+    const observateur = new IntersectionObserver(
+      ([entree]) => {
+        const compact = !entree.isIntersecting;
+        header.classList.toggle('shadow-[0_2px_16px_rgba(10,8,5,0.28)]', compact);
+        if (conteneur) conteneur.toggleAttribute('data-compact', compact);
+      },
+      { threshold: 0 }
+    );
+    observateur.observe(sentinelle);
+  }
+</script>
