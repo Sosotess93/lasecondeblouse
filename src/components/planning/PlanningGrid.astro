@@ -32,13 +32,29 @@ const lignes = semaines(semainesAffichees);
 const jours = lignes.flat();
 const enTetes = lignes.flatMap(() => JOURS);
 
-const PAS = 40; // ms : cascade de gauche à droite
 /* Délai après l'entrée de la grille dans le viewport, et non après le
    chargement : la grille se trouve sous la ligne de flottaison, y compris
    sur desktop. Déclenchée au chargement, la séquence serait terminée avant
    que qui que ce soit ne la voie. */
 const DEPART = 600;
-const dureeCascade = (jours.length - 1) * PAS + 350;
+const ETALEMENT = 1120; // ms entre la première cellule et la dernière
+const TRANSITION = 350; // durée de vidage d'une cellule
+
+/**
+ * Répartition des délais en courbe plutôt qu'en pas constant.
+ *
+ * À 40 ms fixes par cellule, la vague battait la mesure comme un métronome :
+ * l'œil entendait la machine. Un smoothstep la fait démarrer doucement,
+ * balayer le milieu du mois, puis se poser sur les derniers jours. Même durée
+ * totale, geste beaucoup moins mécanique.
+ */
+function delaiCellule(index: number, total: number): number {
+  if (total <= 1) return 0;
+  const t = index / (total - 1);
+  return Math.round(ETALEMENT * t * t * (3 - 2 * t));
+}
+
+const dureeCascade = ETALEMENT + TRANSITION;
 
 const cellulesMobile = semainesMobile * JOURS.length;
 ---
@@ -62,7 +78,7 @@ const cellulesMobile = semainesMobile * JOURS.length;
           <PlanningCell
             valeur={poste}
             etat={etatDe(poste)}
-            delai={anime ? index * PAS : 0}
+            delai={anime ? delaiCellule(index, jours.length) : 0}
             class={index >= cellulesMobile ? 'hors-mobile' : ''}
           />
         ))
@@ -77,13 +93,21 @@ const cellulesMobile = semainesMobile * JOURS.length;
         data-legende-planning
         data-apres={legendeApres}
       >
-        {legendeAvant ?? legendeApres}
+        <span data-texte-legende>{legendeAvant ?? legendeApres}</span>
       </figcaption>
     )
   }
 </figure>
 
 <style>
+  /* La légende basculait d'un texte à l'autre d'un coup, juste après une
+     séquence entièrement animée. C'est pourtant le moment où la grille
+     délivre son propos : elle mérite le même soin. */
+  [data-texte-legende] {
+    display: inline-block;
+    transition: opacity 260ms var(--ease-doux);
+  }
+
   .grille-planning {
     display: flex;
     flex-direction: column;
@@ -156,8 +180,15 @@ const cellulesMobile = semainesMobile * JOURS.length;
     const legende = figure?.querySelector<HTMLElement>('[data-legende-planning]');
     const texteApres = legende?.dataset.apres;
 
+    const texte = legende?.querySelector<HTMLElement>('[data-texte-legende]');
+
     const basculerLegende = () => {
-      if (legende && texteApres) legende.textContent = texteApres;
+      if (!texte || !texteApres) return;
+      texte.style.opacity = '0';
+      window.setTimeout(() => {
+        texte.textContent = texteApres;
+        texte.style.opacity = '1';
+      }, 260);
     };
 
     if (mouvementReduit || !('IntersectionObserver' in window)) {
